@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use DB;
 use App\Product;
 use Illuminate\Http\Request;
 
@@ -24,7 +25,8 @@ class ProductController extends Controller
      */
     public function index()
     {
-        return view('/product/upload');
+        $products = $this->getImageList();
+        return view('/products/upload', compact('products'));
     }
     
     /**
@@ -39,19 +41,29 @@ class ProductController extends Controller
                    'file',
                ]
         ]);
-        
         if ($request->file('file')->isValid([])) {
-             $filename = $request->file->store('public/image');
-
+             $filename = $request->file->storeAs('public/image', $request->file->getClientOriginalName());
+             $product = new Product();
              $product->product_image = basename($filename);
              $product->save();
              
-             return redirect('/product.upload')->with('success', '保存しました。');
+             return redirect('/product')->with('success', '保存しました。');
          } else {
              return redirect()
                     ->back()
                     ->withInput()
                     ->withErrors(['file' => '画像がアップロードされていないか不正なデータです。']);
          }
+    }
+    
+    /**
+     * 商品イメージリスト全件取得
+     * @return List ImageInfo
+     */
+    public function getImageList()
+    {
+        $imageInfo = DB::table('products')->get();
+        
+        return $imageInfo;
     }
 }

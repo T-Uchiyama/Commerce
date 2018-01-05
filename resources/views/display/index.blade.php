@@ -25,9 +25,13 @@
                                         <th>
                                             <form action="{{ url('/display/purchase/'.$info->id) }}" method="POST" class="form-horizontal">
                                                 {{ csrf_field() }}
-                                                <button type="submit" class="btn btn-info">
-                                                    <i class="fa fa-btn fa-trash"></i>Purchase
-                                                </button>
+                                                @if ($info->id == $purchaseNum)
+                                                    販売済み
+                                                @else
+                                                    <button type="submit" class="btn btn-info">
+                                                        <i class="fa fa-btn fa-trash"></i>Purchase
+                                                    </button>
+                                                @endif
                                             </form>
                                         </th>
                                     </tr>

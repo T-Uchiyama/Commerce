@@ -8,6 +8,9 @@ use Session;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
+use Illuminate\Support\Facades\Mail;
+use App\Mail\OrderShipped;
+
 class DisplayController extends Controller
 {
     /**
@@ -17,64 +20,89 @@ class DisplayController extends Controller
      */
     public function index()
     {
-        /**
-         * FIXME:: 現状ではセッションデータのproduct_idとProduct.idが合致した際に
-         *         購入済みとなるようにしているがlogoutした際にユーザセッションを全て
-         *         破棄するようになっているためlogoutした際でも購入手続きをしたことを保持する必要あり。
-         *
-         *         また今のプログラムでは単一でしか動作していないので購入履歴を複数個持てるようにも修正要。
-         */
-        $purchaseNum = Session::get('product_id', '');     
-        // TODO:: 今はダイレクトにDB取得しているが既に取得メソッドを記載しているのでそちらから引っ張るようにする。
+        // FIXME:: 今はダイレクトにDB取得しているが既に取得メソッドを記載しているのでそちらから引っ張るようにする。
         $productInfo = DB::table('products')->get();
-        return view('/display/index', compact('productInfo', 'purchaseNum'));
+        return view('/display/index', compact('productInfo'));
     }
     
     /**
-     * 購入手続き
+     * Show the application dashboard.
+     *
+     * @param  Request $request リクエストデータ
+     * @param  integer $id 商品ID
+     * @return \Illuminate\Http\Response
+     */
+    public function shop(Request $request, $id = 0)
+    {
+        $productInfo = array();
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+            // セッションにカート追加。
+            if (!$request->session()->has('cart')) {
+                $request->session()->put('cart', array());
+            } 
+            $request->session()->push('cart', $id);
+            $sessionArr = $request->session()->get('cart');
+            
+            for ($i = 0; $i < count($sessionArr); $i++) {
+                array_push($productInfo, DB::table('products')->where('id', $sessionArr[$i])
+                                                              ->select('id', 'product_image')
+                                                              ->get());
+            }
+            
+            // TODO::同IDが存在した場合は個数を増やし、データ上の重複をなくす。
+        }
+        $page_id = $id;
+        return view('/display/shop', compact('productInfo', 'page_id'));
+    }
+    /**
+     * カートを空にする。
+     * 
+     * @param  Request $request リクエストデータ
+     * @param  integer $id PageID
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function emptyCart(Request $request, $id)
+    {
+        $request->session()->forget('cart');
+        return redirect()->action(
+            'DisplayController@shop', ['id' => $id]
+        );
+    }
+    
+    /**
+     * 購入手続き(メール送信し購入内容をユーザーに)
      * 
      * @param  Request $request リクエストデータ
      * @param   $id      商品ID
      * 
-     * @return [type]           [description]
+     * @return  \Illuminate\Http\Response
      */
     public function purchase(Request $request, $id)
     {
-        /**
-         * 現時点で必要な情報
-         * $id = id;
-         * 購入者情報 ← セッションID + cookieで実現
-         * 
-         */
+        $idArr = $request->session()->get('cart');
+        $request->session()->put('purchased', array());
+        for ($i = 0; $i < count($idArr); $i++) {
+            $request->session()->push('purchased', $idArr[$i]);
+        }
+        $purchaseNum = Session::get('purchased', '');
         
-        // 名前を取得
-        $user_id = $request->session()->get('user_id',  \Auth::user()->id);
-        // セッションIDの取得
-        $session_id = $request->session()->getId();
+        $item = '';
+        foreach (array_unique($purchaseNum) as $key) {
+            $product = DB::table('products')->where('id', $key)
+                                            ->select('product_image')
+                                            ->first();
+            $item = $item . $product->product_image . ',' . "\n";
+        }
         
-        if (DB::table('sessions')->where('id', $session_id)) {
-            $sessionInfo = DB::table('sessions')->where('id', $session_id)->first();
-            // echo "<pre>";
-            // echo "sessionInfo";
-            // var_dump($sessionInfo);
-            // echo "ID: ";
-            // var_dump($id);
-            // echo "Session()->get('product_id') : ";
-            // var_dump($request->session()->get('product_id'));
-            
-            // 購入IDを保存する
-            $request->session()->put('product_id', $id);
-            // echo "Session()->put('product_id')";
-            // var_dump($request->session()->get('product_id'));
-            // echo "</pre>";
-            // exit;
-
-            //  SessionDBにproduct_idを格納
-            //  TODO:: logoutするとDB内の値もリセットされている。
-            DB::table('sessions')->where('id', $session_id)->update(['product_id' => $id]);
-            $response = new Response($this->index());
-            $response->cookie('product_id', $id, 60 * 24 * 30);
-            return $response;
-        }        
+        // TODO:: メール本文に改行が出力されない。
+        //        個数や購入後のアイテムソートを後に追加。
+        $data = array(
+            'Content' => '今回お買い上げの商品は' . "\n" . $item .' です。'
+        );
+        $request->session()->put('mail_content', $data);
+        Mail::to(\Auth::user()->email)->send(new OrderShipped($request));
+        return redirect()->action('DisplayController@index')
+                         ->with('status', 'Send Mail!!');        
     }
 }

@@ -23,4 +23,7 @@ Route::get('/product', 'ProductController@index')->name('product');
 Route::post('/product/upload', 'ProductController@upload');
 
 Route::get('/display', 'DisplayController@index')->name('display');
+Route::get('/display/shop/{id}', 'DisplayController@shop');
+Route::post('/display/shop/{id}', 'DisplayController@shop');
 Route::post('/display/purchase/{id}', 'DisplayController@purchase');
+Route::get('/display/emptyCart/{id}', 'DisplayController@emptyCart');

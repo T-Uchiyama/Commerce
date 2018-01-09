@@ -2,6 +2,11 @@
 
 @section('content')
 <div class="container">
+    @if (session('status'))
+        <div class="alert alert-success">
+            {{ session('status') }}
+        </div>
+    @endif
     <div class="row">
         <div class="col-md-8 col-md-offset-2">
             <div class="panel panel-default">
@@ -18,20 +23,16 @@
                             </thead>
                             <tbody>
                                 <!-- TODO:: 現状はサムネイルのみとなっているが金額と売買誓約フラグを後に追加し購入の流れを作成 -->
-                                @foreach ($productInfo as $info) 
+                                @foreach ($productInfo as $key => $info) 
                                     <tr>
                                         <th>{{ $info->id }}</th>
                                         <th><img src="{{ asset('storage/image/' . $info->product_image) }}" alt="image" width=100 height=100 /></th>
                                         <th>
-                                            <form action="{{ url('/display/purchase/'.$info->id) }}" method="POST" class="form-horizontal">
+                                            <form action="{{ url('/display/shop/'.$info->id) }}" method="POST" class="form-horizontal">
                                                 {{ csrf_field() }}
-                                                @if ($info->id == $purchaseNum)
-                                                    販売済み
-                                                @else
-                                                    <button type="submit" class="btn btn-info">
-                                                        <i class="fa fa-btn fa-trash"></i>Purchase
-                                                    </button>
-                                                @endif
+                                                <button type="submit" class="btn btn-info">
+                                                    <i class="fa fa-btn fa-trash"></i>購入手続きへ
+                                                </button>
                                             </form>
                                         </th>
                                     </tr>

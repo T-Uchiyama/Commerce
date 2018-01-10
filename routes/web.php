@@ -27,3 +27,5 @@ Route::get('/display/shop/{id}', 'DisplayController@shop');
 Route::post('/display/shop/{id}', 'DisplayController@shop');
 Route::post('/display/purchase/{id}', 'DisplayController@purchase');
 Route::get('/display/emptyCart/{id}', 'DisplayController@emptyCart');
+
+Route::get('/register_facebook', 'Auth\LoginController@register_facebook');

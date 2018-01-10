@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+<script src="{{ asset('js/facebook.js') }}"></script>
 <div class="container">
     <div class="row">
         <div class="col-md-8 col-md-offset-2">
@@ -61,6 +62,23 @@
                             </div>
                         </div>
                     </form>
+                        <!-- Facebookでログイン -->
+                    <form class="form-horizontal" method="POST" action="{{ route('register') }}">
+                        {{ csrf_field() }}
+                        <div class="form-group">
+                            <div class="col-md-8 col-md-offset-4">
+                                <div id="status"></div>
+                                <div class="fb-login-button" 
+                                     scope="public_profile,email"
+                                     data-max-rows="1" 
+                                     data-size="large" 
+                                     data-button-type="continue_with" 
+                                     data-show-faces="false" 
+                                     data-auto-logout-link="false" 
+                                     data-use-continue-as="false"></div>
+                        </div>
+                    </form>
+                    </div>
                 </div>
             </div>
         </div>

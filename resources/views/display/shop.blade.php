@@ -21,17 +21,25 @@
                                 @foreach ($productInfo as $key => $info)
                                     @if (!empty($info[0]))
                                         <tr>
-                                            <td>{{ $info[0]->product_image }}</td>
-                                            <td>現状一律千円</td>
-                                            <td>現状一律1個</td>
-                                            <td>1000</td>
+                                            @if (!empty($info[0]->product_name))
+                                                <td>{{ $info[0]->product_name }}</td>
+                                            @else
+                                                <td>{{ $info[0]->product_image }}</td>
+                                            @endif
+                                            @if (($info[0]->price) != 0)
+                                                <td>{{ $info[0]->price }}円</td>
+                                            @else
+                                                <td>1000円</td>
+                                            @endif
+                                            <td>{{ $info[0]->number }}個</td>
+                                            <td>{{ $info[0]->subtotal }}</td>
                                         </tr>
                                     @endif
                                 @endforeach
                                 <tr>
                                     <td colspan='2'> </td>
                                     <td><strong>合計</strong></td>
-                                    <td> 円</td>
+                                    <td> {{ $total }}円</td>
                                 </tr>
                             </tbody>
                         </table>

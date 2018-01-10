@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class ModifySessionTable extends Migration
+class ModifyProductsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,9 @@ class ModifySessionTable extends Migration
      */
     public function up()
     {
-        Schema::table('sessions', function (Blueprint $table) {
-            $table->integer('product_id')->nullable();
+        Schema::table('products', function (Blueprint $table) {
+            $table->integer('price')->default(0);
+            $table->string('product_name')->nullable();
         });
     }
 
@@ -25,8 +26,8 @@ class ModifySessionTable extends Migration
      */
     public function down()
     {
-        Schema::table('sessions', function (Blueprint $table) {
-            $table->dropColumn(['product_id']);
+        Schema::table('products', function (Blueprint $table) {
+            $table->dropColumn(['price']);
         });
     }
 }

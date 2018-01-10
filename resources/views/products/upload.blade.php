@@ -30,6 +30,16 @@
                         {!! Form::label('file', '画像アップロード', ['class' => 'control-label']) !!}
                         {!! Form::file('file') !!}
                     </div>
+                    
+                    <div class="form-group">
+                        {!! Form::label('productName', '商品名:') !!}
+                        {!! Form::text('productName', null, ['class' => 'form-control']) !!}
+                    </div>
+                    
+                    <div class="form-group">
+                        {!! Form::label('price', '販売金額:') !!}
+                        {!! Form::text('price', null, ['class' => 'form-control']) !!}
+                    </div>
 
                     <div class="form-group">
                         {!! Form::submit('アップロード', ['class' => 'btn btn-default']) !!}

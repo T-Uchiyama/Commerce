@@ -37,14 +37,18 @@ class ProductController extends Controller
     {
         $this->validate($request, [
             'file' => [
-                   'required',
-                   'file',
-               ]
+                'required',
+                'file',
+            ],
+            'productName' => 'required',
+            'price'       => 'numeric|required',
         ]);
         if ($request->file('file')->isValid([])) {
              $filename = $request->file->storeAs('public/image', $request->file->getClientOriginalName());
              $product = new Product();
              $product->product_image = basename($filename);
+             $product->product_name = $request->productName;
+             $product->price = $request->price;
              $product->save();
              
              return redirect('/product')->with('success', '保存しました。');

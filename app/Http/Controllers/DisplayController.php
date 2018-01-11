@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Display;
 use DB;
+use App\User;
 use Session;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -11,8 +12,56 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\OrderShipped;
 
+use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Auth\Events\Registered;
+
 class DisplayController extends Controller
-{
+{    
+    /*
+     * TODO::ここからfunction createまではtraitの機能を直で使おうと
+     *       引っ張ってきたものなので綺麗にできたら不要になる可能性大。
+     */
+    use RegistersUsers;
+    
+    /**
+     * Where to redirect users after registration.
+     *
+     * @var string
+     */
+    protected $redirectTo = '/display';
+    
+    /**
+     * Get a validator for an incoming registration request.
+     *
+     * @param  array  $data
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    protected function validator(array $data)
+    {
+        echo "validator start";
+        return Validator::make($data, [
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|',
+            'password' => 'required|string|min:6|confirmed',
+        ]);
+    }
+    
+    /**
+     * Create a new user instance after a valid registration.
+     *
+     * @param  array  $data
+     * @return \App\User
+     */
+    protected function create(array $data)
+    {
+        return User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => bcrypt($data['password']),
+        ]);
+    }
+    
     /**
      * Show the application dashboard.
      *
@@ -20,6 +69,60 @@ class DisplayController extends Controller
      */
     public function index()
     {
+        $is_facebook = !empty($_REQUEST['code']) ? true : false;
+        if($is_facebook) {
+            $code = $_REQUEST['code'];
+
+            $app_id = '462326684162348';
+            $app_secret = 'f31ef150b526eaa8d67891bad7a47ddb';
+            $callback = 'http://commerce.test/display';
+            
+            $token_url = 'https://graph.facebook.com/oauth/access_token?client_id='.
+                         $app_id . '&redirect_uri=' . urlencode($callback) . '&client_secret='.
+                         $app_secret . '&code=' . $code;
+                         
+
+            // access_tokenの取得
+            $access_token = file_get_contents($token_url);
+            $start_needle = strpos($access_token, ':');
+            $end_needle = strpos($access_token, ',');
+            // access_tokenの値のみを取得するように文字列切り取り
+            $access_token = substr($access_token, $start_needle + 2, ($end_needle - $start_needle - 3));
+
+            // ユーザ情報をjsonにて取得しdecode
+            $user_json = file_get_contents('https://graph.facebook.com/me/?fields=email,id,name&access_token=' . $access_token);
+            $user = json_decode($user_json);
+            
+            // facebookからユーザー登録に必要な情報を取得
+            $request = new Request();
+            $request->name     = $user->name;
+            $request->email    = $user->email;
+            $request->password = $access_token;
+
+            // TODO:: 新規登録ができていない。
+            if (empty(DB::select('select * from users where name = :name', ['name' => $request->name]))) {
+                // 空の場合には新規登録
+                // echo "<pre>";
+                // echo "aaa";
+                // // var_dump($request);
+                // // var_dump($this->validator($request->all()));
+                // echo "bbb";
+                // exit;                    
+                // $this->validator($request->all())->validate();
+                // 
+                // event(new Registered($user = $this->create($request->all())));
+                // echo "bbb";
+                // $this->guard()->login($user);
+                // echo "ccc";
+                // echo "</pre>";
+                // exit;
+                // return $this->registered($request, $user)
+                //                 ?: redirect($this->redirectPath());
+            } else {
+                // 登録済みの場合にはログイン処理実施
+            }
+        }
+
         // FIXME:: 今はダイレクトにDB取得しているが既に取得メソッドを記載しているのでそちらから引っ張るようにする。
         $productInfo = DB::table('products')->get();
         return view('/display/index', compact('productInfo'));

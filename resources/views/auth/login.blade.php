@@ -74,8 +74,9 @@
                                      data-size="large" 
                                      data-button-type="continue_with" 
                                      data-show-faces="false" 
-                                     data-auto-logout-link="false" 
-                                     data-use-continue-as="false"></div>
+                                     data-auto-logout-link="true" 
+                                     data-use-continue-as="false"
+                                     onlogin="useFacebookLogin()"></div>
                         </div>
                     </form>
                     </div>

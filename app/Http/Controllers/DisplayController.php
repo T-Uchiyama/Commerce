@@ -36,7 +36,7 @@ class DisplayController extends Controller
     {
         $productInfo = array();
         $total = 0;
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        if ($request->isMethod('post')) {
             // セッションにカート追加
             if (!$request->session()->has('cart')) {
                 $request->session()->put('cart', array());

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Display;
+use Auth;
 use DB;
 use App\User;
 use Session;
@@ -13,16 +14,17 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\OrderShipped;
 
 use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Auth\Events\Registered;
 
 class DisplayController extends Controller
 {    
-    /*
-     * TODO::ここからfunction createまではtraitの機能を直で使おうと
-     *       引っ張ってきたものなので綺麗にできたら不要になる可能性大。
-     */
     use RegistersUsers;
+    use AuthenticatesUsers {
+        AuthenticatesUsers::guard insteadof RegistersUsers; 
+        AuthenticatesUsers::redirectPath insteadof RegistersUsers; 
+    }
     
     /**
      * Where to redirect users after registration.
@@ -39,26 +41,10 @@ class DisplayController extends Controller
      */
     protected function validator(array $data)
     {
-        echo "validator start";
         return Validator::make($data, [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|',
-            'password' => 'required|string|min:6|confirmed',
-        ]);
-    }
-    
-    /**
-     * Create a new user instance after a valid registration.
-     *
-     * @param  array  $data
-     * @return \App\User
-     */
-    protected function create(array $data)
-    {
-        return User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => bcrypt($data['password']),
+            'name' => 'string|max:255',
+            'email' => 'string|email|max:255',
+            'password' => 'string|min:6',
         ]);
     }
     
@@ -92,35 +78,28 @@ class DisplayController extends Controller
             // ユーザ情報をjsonにて取得しdecode
             $user_json = file_get_contents('https://graph.facebook.com/me/?fields=email,id,name&access_token=' . $access_token);
             $user = json_decode($user_json);
-            
-            // facebookからユーザー登録に必要な情報を取得
-            $request = new Request();
-            $request->name     = $user->name;
-            $request->email    = $user->email;
-            $request->password = $access_token;
-
-            // TODO:: 新規登録ができていない。
-            if (empty(DB::select('select * from users where name = :name', ['name' => $request->name]))) {
-                // 空の場合には新規登録
-                // echo "<pre>";
-                // echo "aaa";
-                // // var_dump($request);
-                // // var_dump($this->validator($request->all()));
-                // echo "bbb";
-                // exit;                    
-                // $this->validator($request->all())->validate();
-                // 
-                // event(new Registered($user = $this->create($request->all())));
-                // echo "bbb";
-                // $this->guard()->login($user);
-                // echo "ccc";
-                // echo "</pre>";
-                // exit;
-                // return $this->registered($request, $user)
-                //                 ?: redirect($this->redirectPath());
+            // facebookからユーザー登録に必要な情報を取得            
+            $data = array(
+                'name' => $user->name,
+                'email' => $user->email,
+                'password' => $access_token,
+            );
+            $this->validator($data)->validate();
+            if (empty(DB::select('select * from users where name = :name', ['name' => $data['name']]))) {
+                // 空の場合には新規登録   
+                event(new Registered($user = User::create([
+                    'name' => $data['name'],
+                    'email' => $data['email'],
+                    'password' => bcrypt($data['password']),
+                ])));
+                
             } else {
-                // 登録済みの場合にはログイン処理実施
+                event(new Registered($user = User::firstOrNew([
+                    ['name', '=', $data['name']],
+                    ['email', '=', $data['email']],
+                ])));
             }
+            $this->guard()->login($user);
         }
 
         // FIXME:: 今はダイレクトにDB取得しているが既に取得メソッドを記載しているのでそちらから引っ張るようにする。

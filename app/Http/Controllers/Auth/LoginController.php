@@ -38,12 +38,9 @@ class LoginController extends Controller
     }
     
     public function confirm_facebook()
-    {
-        $app_id = '462326684162348';
-        $app_secret = 'f31ef150b526eaa8d67891bad7a47ddb';
-        $callback = 'http://commerce.test/display';
-        
-        $authURL = 'http://www.facebook.com/dialog/oauth?client_id=' . $app_id . '&redirect_uri=' . urlencode($callback);
+    {        
+        $authURL = 'http://www.facebook.com/dialog/oauth?client_id=' .  \Config::get('const.FACEBOOK_ID') . 
+                   '&redirect_uri=' . urlencode(\Config::get('const.OAUTH_CALLBACK'));
         return json_encode($authURL);
     }
 }

@@ -58,16 +58,11 @@ class DisplayController extends Controller
         $is_facebook = !empty($_REQUEST['code']) ? true : false;
         if($is_facebook) {
             $code = $_REQUEST['code'];
-
-            $app_id = '462326684162348';
-            $app_secret = 'f31ef150b526eaa8d67891bad7a47ddb';
-            $callback = 'http://commerce.test/display';
             
             $token_url = 'https://graph.facebook.com/oauth/access_token?client_id='.
-                         $app_id . '&redirect_uri=' . urlencode($callback) . '&client_secret='.
-                         $app_secret . '&code=' . $code;
+                         \Config::get('const.FACEBOOK_ID') . '&redirect_uri=' . urlencode(\Config::get('const.OAUTH_CALLBACK')) . 
+                         '&client_secret='. \Config::get('const.FACEBOOK_SECRET') . '&code=' . $code;
                          
-
             // access_tokenの取得
             $access_token = file_get_contents($token_url);
             $start_needle = strpos($access_token, ':');

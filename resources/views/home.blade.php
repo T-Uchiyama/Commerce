@@ -14,7 +14,23 @@
                         </div>
                     @endif
 
-                    You are logged in!
+                    <h4>This is AdminSite Home</h4> 
+                    
+                    <div class="from-group">
+                        <a href="{{ route('user_info') }}">
+                            ユーザー情報一覧を表示
+                        </a>
+                    </div>
+                    <div class="from-group">
+                        <a href="{{ route('product_info') }}">
+                            商品在庫一覧を表示
+                        </a>
+                    </div>
+                    <div class="from-group">
+                        <a href="{{ route('display') }}">
+                            商品購入ページへ遷移
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

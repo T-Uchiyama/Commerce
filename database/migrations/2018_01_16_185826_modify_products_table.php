@@ -14,8 +14,7 @@ class ModifyProductsTable extends Migration
     public function up()
     {
         Schema::table('products', function (Blueprint $table) {
-            $table->integer('price')->default(0);
-            $table->string('product_name')->nullable();
+            $table->integer('stock')->default(0);
         });
     }
 
@@ -27,8 +26,7 @@ class ModifyProductsTable extends Migration
     public function down()
     {
         Schema::table('products', function (Blueprint $table) {
-            $table->dropColumn(['price']);
-            $table->dropColumn(['product_name']);
+            $table->dropColumn(['stock']);
         });
     }
 }

@@ -25,9 +25,12 @@ Route::get('/product', 'ProductController@index')->name('product');
 Route::post('/product/upload', 'ProductController@upload');
 
 Route::get('/display', 'DisplayController@index')->name('display');
+Route::get('/display/detail/{id}', 'DisplayController@getDetail');
 Route::get('/display/shop/{id}', 'DisplayController@shop');
 Route::post('/display/shop/{id}', 'DisplayController@shop');
 Route::post('/display/purchase/{id}', 'DisplayController@purchase');
 Route::get('/display/emptyCart/{id}', 'DisplayController@emptyCart');
+
+Route::get('/regist_member', 'DisplayController@getRegistMember')->name('regist_member');
 
 Route::get('/confirm_facebook', 'Auth\LoginController@confirm_facebook');

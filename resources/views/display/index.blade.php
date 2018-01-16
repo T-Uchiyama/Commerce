@@ -18,27 +18,37 @@
                                 <tr>
                                     <th>#</th>
                                     <th>Name</th>
-                                    <th>Purchase</th>
+                                    <th>Thumbnail</th>
+                                    <th>Price</th>
+                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- TODO:: 現状はサムネイルのみとなっているが金額と売買誓約フラグを後に追加し購入の流れを作成 -->
                                 @foreach ($productInfo as $key => $info) 
                                     <tr>
                                         <th>{{ $info->id }}</th>
+                                        <th>{{ $info->product_name }}</th>
                                         <th><img src="{{ asset('storage/image/' . $info->product_image) }}" alt="image" width=100 height=100 /></th>
+                                        <th>{{ $info->price }}円</th>
                                         <th>
-                                            <form action="{{ url('/display/shop/'.$info->id) }}" method="POST" class="form-horizontal">
-                                                {{ csrf_field() }}
-                                                <button type="submit" class="btn btn-info">
-                                                    <i class="fa fa-btn fa-trash"></i>購入手続きへ
-                                                </button>
-                                            </form>
+                                            <a href="{{ url('/display/detail/'.$info->id) }}">詳細を表示</a>
                                         </th>
                                     </tr>
                                 @endforeach
                             </tbody>
                         </table>
+                    </div>
+                    
+                    <div class="form-group">
+                        <a href="{{ route('regist_member') }}">
+                            会員登録
+                        </a>
+                        <a href="{{ route('product') }}">
+                            商品登録
+                        </a>
+                        <a href="{{ url('/display/') }}">
+                            商品登録
+                        </a>
                     </div>
                 </div>
             </div>

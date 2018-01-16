@@ -103,6 +103,31 @@ class DisplayController extends Controller
     }
     
     /**
+     * 詳細画面の表示
+     * 
+     * @param  integer $id 商品ID
+     * @return \Illuminate\Http\Response
+     */
+    public function getDetail($id = 0)
+    {
+        $product = DB::table('products')->where('id', $id)
+                                        ->select('id', 'product_name', 'product_image', 'price', 'stock')
+                                        ->first();
+        return view('display.detail', compact('product'));
+    }
+    
+    /**
+     * 会員登録画面の表示
+     * 
+     * @param  integer $id 商品ID
+     * @return \Illuminate\Http\Response
+     */
+    public function getRegistMember()
+    {
+        # code...
+    }
+    
+    /**
      * Show the application dashboard.
      *
      * @param  Request $request リクエストデータ

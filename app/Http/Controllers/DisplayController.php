@@ -119,12 +119,11 @@ class DisplayController extends Controller
     /**
      * 会員登録画面の表示
      * 
-     * @param  integer $id 商品ID
      * @return \Illuminate\Http\Response
      */
     public function getRegistMember()
     {
-        # code...
+        return view('register.index');
     }
     
     /**

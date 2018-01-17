@@ -31,22 +31,26 @@
                     <!-- Twitterでログイン -->
                     <div class="form-group">
                         <div class="col-md-8 col-md-offset-4">
-                            <button class="twitter">
-                                <i class="fa fa-twitter-square" aria-hidden="true">
-                                </i>
-                                Twitterでログイン
-                            </button>
+                            <a href="{{ url('/confirm_twitter') }}">
+                                <button class="twitter">
+                                    <i class="fa fa-twitter-square" aria-hidden="true">
+                                    </i>
+                                    Twitterでログイン
+                                </button>
+                            </a>
                         </div>
                     </div>
 
                     <!-- Google+でログイン -->
                     <div class="form-group">
                         <div class="col-md-8 col-md-offset-4">
-                            <button class="google">
-                                <i class="fa fa-google-plus-square" aria-hidden="true">    
-                                </i>
-                                Google+でログイン
-                            </button>            
+                            <a href="{{ url('/confirm_google') }}">
+                                <button class="google">
+                                    <i class="fa fa-google-plus-square" aria-hidden="true">    
+                                    </i>
+                                    Google+でログイン
+                                </button>  
+                            </a>
                         </div>
                     </div>
                     

@@ -37,7 +37,7 @@
                         <form action="{{ url('/display/shoppingcart/'.$product->id)}}" method="POST" class="form-horizontal">
                             {{ csrf_field() }}
                             <button type="submit" class="btn btn-info">
-                                <i class="fa fa-btn fa-trash"></i>ショッピングカートへ追加
+                                <i class="fa fa-shopping-cart"></i>ショッピングカートへ追加
                             </button>
                         </form>
                         

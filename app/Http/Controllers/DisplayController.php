@@ -18,6 +18,8 @@ use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Auth\Events\Registered;
 
+use Abraham\TwitterOAuth\TwitterOAuth;
+
 class DisplayController extends Controller
 {    
     use RegistersUsers;
@@ -56,6 +58,7 @@ class DisplayController extends Controller
     public function index()
     {
         $is_facebook = !empty($_REQUEST['code']) ? true : false;
+        $is_twitter = !empty($_REQUEST['oauth_token']) ? true : false;
         if($is_facebook) {
             $code = $_REQUEST['code'];
             
@@ -79,22 +82,41 @@ class DisplayController extends Controller
                 'email' => $user->email,
                 'password' => $access_token,
             );
-            $this->validator($data)->validate();
-            if (empty(DB::select('select * from users where name = :name', ['name' => $data['name']]))) {
-                // 空の場合には新規登録   
-                event(new Registered($user = User::create([
-                    'name' => $data['name'],
-                    'email' => $data['email'],
-                    'password' => bcrypt($data['password']),
-                ])));
-                
-            } else {
-                event(new Registered($user = User::firstOrNew([
-                    ['name', '=', $data['name']],
-                    ['email', '=', $data['email']],
-                ])));
-            }
-            $this->guard()->login($user);
+            $this->oauthAsUserLogin($data);
+            
+        } else if ($is_twitter) {            
+            $connection = new TwitterOAuth(
+                \Config::get('const.TWITTER_KEY'),
+                \Config::get('const.TWITTER_SECRET'), 
+                Session::get('oauth_token'), 
+                Session::get('oauth_token_secret')
+            );
+            
+            // access_tokenの取得
+            $access_token = $connection->oauth("oauth/access_token", array("oauth_verifier" => $_REQUEST['oauth_verifier']));
+            
+            //ユーザー情報取得のために取得したアクセストークンを用い再度インスタンスを作成
+            $getUserConnection = new TwitterOAuth(
+                \Config::get('const.TWITTER_KEY'),
+                \Config::get('const.TWITTER_SECRET'), 
+                $access_token['oauth_token'], 
+                $access_token['oauth_token_secret']
+            );
+            
+            //  twitterからユーザー登録に必要な情報を取得
+            $userData = $getUserConnection->get("account/verify_credentials", ['include_entities'=> 'false', 'include_email'=> 'true']);
+            
+            // TODO:: 本来であればemailにはTwitterに登録しているメールアドレスを追加するのだが
+            //        TwitterOAuthから権限取得しなければメールアドレスを取得できないため
+            //        現在はテストのためランダムで生成したアドレスを格納
+            $data = array(
+                'name' => $userData->screen_name,
+                'email' => uniqid().'@test.com',
+                'password' => $access_token['oauth_token'],
+            );
+            
+            $this->oauthAsUserLogin($data);
+            
         }
 
         // FIXME:: 今はダイレクトにDB取得しているが既に取得メソッドを記載しているのでそちらから引っ張るようにする。
@@ -272,5 +294,35 @@ class DisplayController extends Controller
         $request->session()->forget('number');
         return redirect()->action('DisplayController@index')
                          ->with('status', 'Send Mail!!');        
+    }
+    
+    /**
+     * OAuthで取得したユーザー情報を用いてCommerceサイトへログイン
+     * 
+     * @param  $oauthData 各種OAuthのデータ
+     */
+    public function oauthAsUserLogin($oauthData)
+    {
+        $this->validator($oauthData)->validate();
+        if (empty(DB::select('select * from users where name = :name', ['name' => $oauthData['name']]))) {
+            // 空の場合には新規登録   
+            event(new Registered($user = User::create([
+                'name' => $oauthData['name'],
+                'email' => $oauthData['email'],
+                'password' => bcrypt($oauthData['password']),
+            ])));
+            
+        } else {
+            // TODO::本来はemailも条件に含めてより一意の条件にしたいが、
+            //       Twitterの登録アドレスを上記に述べた理由でランダム生成しているためnameだけで取得
+            // event(new Registered($user = User::firstOrNew([
+            //     ['name', '=', $oauthData['name']],
+            //     ['email', '=', $oauthData['email']],
+            // ])));
+            event(new Registered($user = User::firstOrNew([
+                ['name', '=', $oauthData['name']],
+            ])));
+        }
+        $this->guard()->login($user);
     }
 }

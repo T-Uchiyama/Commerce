@@ -35,3 +35,5 @@ Route::get('/display/emptyCart/{id}', 'DisplayController@emptyCart');
 Route::get('/regist_member', 'DisplayController@getRegistMember')->name('regist_member');
 
 Route::get('/confirm_facebook', 'Auth\LoginController@confirm_facebook');
+Route::get('/confirm_twitter', 'Auth\LoginController@confirm_twitter');
+Route::get('/confirm_google', 'Auth\LoginController@confirm_google');

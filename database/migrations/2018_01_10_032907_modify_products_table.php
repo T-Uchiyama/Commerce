@@ -15,7 +15,7 @@ class ModifyProductsTable extends Migration
     {
         Schema::table('products', function (Blueprint $table) {
             $table->integer('price')->default(0);
-            $table->string('product_name')->nullable();
+            $table->string('product_name')->default(null);
         });
     }
 

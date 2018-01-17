@@ -2,9 +2,9 @@
 
 @section('content')
 <div class="container">
-    @if (session('status'))
+    @if (session('message'))
         <div class="alert alert-success">
-            {{ session('status') }}
+            {{ session('message') }}
         </div>
     @endif
     <div class="row">
@@ -27,19 +27,23 @@
                                         <th><img src="{{ asset('storage/image/' . $product->product_image) }}" alt="image" width="300px" height="300px"/></th>
                                         <th>{{ $product->product_name }}</th>
                                         <th>{{ $product->price }}円</th>
-                                        <th>残り{{ $product->price }}点</th>
+                                        <th>残り{{ $product->stock }}点</th>
                                     </tr>
                             </tbody>
                         </table>
                     </div>
                     
                     <div class="form-group">
-                        <form action="{{ url('/display/cart/'.$product->id)}}" method="POST" class="form-horizontal">
+                        <form action="{{ url('/display/shoppingcart/'.$product->id)}}" method="POST" class="form-horizontal">
                             {{ csrf_field() }}
                             <button type="submit" class="btn btn-info">
                                 <i class="fa fa-btn fa-trash"></i>ショッピングカートへ追加
                             </button>
                         </form>
+                        
+                        <a href="{{ route('display') }}">
+                            商品一覧へ戻る
+                        </a>
                     </div>
                 </div>
             </div>

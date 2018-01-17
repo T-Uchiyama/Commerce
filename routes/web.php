@@ -28,6 +28,7 @@ Route::get('/display', 'DisplayController@index')->name('display');
 Route::get('/display/detail/{id}', 'DisplayController@getDetail');
 Route::get('/display/shop/{id}', 'DisplayController@shop');
 Route::post('/display/shop/{id}', 'DisplayController@shop');
+Route::post('/display/shoppingcart/{id}', 'DisplayController@addShoppingCart');
 Route::post('/display/purchase/{id}', 'DisplayController@purchase');
 Route::get('/display/emptyCart/{id}', 'DisplayController@emptyCart');
 

@@ -128,6 +128,36 @@ class DisplayController extends Controller
     }
     
     /**
+     * ショッピングカート追加
+     *
+     * @param  Request $request リクエストデータ
+     * @param  integer $id 商品ID
+     * @return \Illuminate\Http\Response
+     */
+    public function addShoppingCart(Request $request, $id = 0)
+    {
+        if ($request->isMethod('post')) {
+            // セッションにカート追加
+            if (!$request->session()->has('cart')) {
+                $request->session()->put('cart', array());
+            } 
+            $product = DB::table('products')->where('id', $id)
+                                            ->select('product_name', 'price')
+                                            ->first();
+            
+            $request->session()->push('cart', array(
+                'id' => $id,
+                'name' => $product->product_name,
+                'price' => $product->price,
+                'stock' => 1,
+            ));
+
+            return redirect()->action('DisplayController@getDetail', ['id' => $id])
+                             ->with('message', 'カートに追加しました');
+        }
+    }
+    
+    /**
      * Show the application dashboard.
      *
      * @param  Request $request リクエストデータ

@@ -67,7 +67,22 @@ class LoginController extends Controller
     }
     
     public function confirm_google()
-    {        
-
+    {
+        /*
+         * TODO::Google＋の設定がNginx.confでリダイレクトの変更
+         *      もしくはトップレベルドメインの取得が必要なため一旦保留
+         *      現状ではリダイレクトURLの登録が".test"では弾かれるために
+         *      404エラーが返ってくる.
+         * 
+         */
+        $connection = new \OAuthClient2Google([
+            'clientId' => \Config::get('const.GOOGLE_ID'),
+            'clientSecret' => \Config::get('const.GOOGLE_SECRET'),
+            'redirectUri' => \Config::get('const.OAUTH_CALLBACK')
+        ]);
+        
+        $authUrl = $connection->getAuthorizationUrl();
+        Session::put('oauth2state',$connection->getState());
+        return redirect($authUrl);
     }
 }

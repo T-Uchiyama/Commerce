@@ -57,34 +57,62 @@ class DisplayController extends Controller
      */
     public function index()
     {
-        $is_facebook = !empty($_REQUEST['code']) ? true : false;
-        $is_twitter = !empty($_REQUEST['oauth_token']) ? true : false;
-        if($is_facebook) {
-            $code = $_REQUEST['code'];
-            
-            $token_url = 'https://graph.facebook.com/oauth/access_token?client_id='.
-                         \Config::get('const.FACEBOOK_ID') . '&redirect_uri=' . urlencode(\Config::get('const.OAUTH_CALLBACK')) . 
-                         '&client_secret='. \Config::get('const.FACEBOOK_SECRET') . '&code=' . $code;
-                         
-            // access_tokenの取得
-            $access_token = file_get_contents($token_url);
-            $start_needle = strpos($access_token, ':');
-            $end_needle = strpos($access_token, ',');
-            // access_tokenの値のみを取得するように文字列切り取り
-            $access_token = substr($access_token, $start_needle + 2, ($end_needle - $start_needle - 3));
+        $is_oauth = !empty($_REQUEST['code']) ? true : false;
+        $is_twitterOAuth = !empty($_REQUEST['oauth_token']) ? true : false;
+        
+        if($is_oauth) {
+            //GoogleOAuthかFacebookかチェック
+            if (!empty($_GET['state']) && ($_GET['state'] === Session::get('oauth2state'))) {
+                // Google
+                $connection = new \OAuthClient2Google([
+                    'clientId' => \Config::get('const.GOOGLE_ID'),
+                    'clientSecret' => \Config::get('const.GOOGLE_SECRET'),
+                    'redirectUri' => \Config::get('const.OAUTH_CALLBACK')
+                ]);
+                
+                $token = $connection->getAccessToken('authorization_code', [
+                    'code' => $_GET['code']
+                ]);
+                
+                $_SESSION['token'] = serialize($token);
+                $token = unserialize($_SESSION['token']);
 
-            // ユーザ情報をjsonにて取得しdecode
-            $user_json = file_get_contents('https://graph.facebook.com/me/?fields=email,id,name&access_token=' . $access_token);
-            $user = json_decode($user_json);
-            // facebookからユーザー登録に必要な情報を取得            
-            $data = array(
-                'name' => $user->name,
-                'email' => $user->email,
-                'password' => $access_token,
-            );
-            $this->oauthAsUserLogin($data);
+                $user = $connection->getResourceOwner($token);
+                
+                $data = array(
+                    'name' => $user->getName(),
+                    'email' => $user->getEmail(),
+                    'password' => $token->getToken(),
+                );
+                $this->oauthAsUserLogin($data);
+            } else {
+                // Facebook
+                $code = $_REQUEST['code'];
+                
+                $token_url = 'https://graph.facebook.com/oauth/access_token?client_id='.
+                             \Config::get('const.FACEBOOK_ID') . '&redirect_uri=' . urlencode(\Config::get('const.OAUTH_CALLBACK')) . 
+                             '&client_secret='. \Config::get('const.FACEBOOK_SECRET') . '&code=' . $code;
+                             
+                // access_tokenの取得
+                $access_token = file_get_contents($token_url);
+                $start_needle = strpos($access_token, ':');
+                $end_needle = strpos($access_token, ',');
+                // access_tokenの値のみを取得するように文字列切り取り
+                $access_token = substr($access_token, $start_needle + 2, ($end_needle - $start_needle - 3));
+
+                // ユーザ情報をjsonにて取得しdecode
+                $user_json = file_get_contents('https://graph.facebook.com/me/?fields=email,id,name&access_token=' . $access_token);
+                $user = json_decode($user_json);
+                // facebookからユーザー登録に必要な情報を取得            
+                $data = array(
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'password' => $access_token,
+                );
+                $this->oauthAsUserLogin($data);
+            }
             
-        } else if ($is_twitter) {            
+        } else if ($is_twitterOAuth) {            
             $connection = new TwitterOAuth(
                 \Config::get('const.TWITTER_KEY'),
                 \Config::get('const.TWITTER_SECRET'), 

@@ -37,3 +37,9 @@ Route::get('/regist_member', 'DisplayController@getRegistMember')->name('regist_
 Route::get('/confirm_facebook', 'Auth\LoginController@confirm_facebook');
 Route::get('/confirm_twitter', 'Auth\LoginController@confirm_twitter');
 Route::get('/confirm_google', 'Auth\LoginController@confirm_google');
+
+Route::get('/admin_login', 'Auth\AdminLoginController@showLoginForm')->name('admin.login');
+Route::post('/admin_login', 'Auth\AdminLoginController@login');
+Route::post('/admin_logout', 'Auth\AdminLoginController@logout')->name('admin.logout');
+Route::get('/admin_register', 'Auth\AdminRegisterController@showRegistrationForm')->name('admin.register');
+Route::post('/admin_register', 'Auth\AdminRegisterController@register');

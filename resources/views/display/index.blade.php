@@ -42,9 +42,11 @@
                     <div class="form-group">
                         <a href="{{ route('regist_member') }}">
                             会員登録
+                            <i class="fa fa-chevron-right" aria-hidden="true"></i>
                         </a>
                         <a href="{{ route('product') }}">
                             商品登録
+                            <i class="fa fa-chevron-right" aria-hidden="true"></i>
                         </a>
                         <a href="{{ url('/display/') }}">
                             商品登録

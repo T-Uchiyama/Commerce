@@ -28,12 +28,20 @@
 
                     <div class="form-group">
                         {!! Form::label('file', '画像アップロード', ['class' => 'control-label']) !!}
-                        {!! Form::file('file') !!}
+                        {!! Form::file('file[]', array('multiple' => true)) !!}
                     </div>
+                    
+                    <div class="add_button_area"></div>
+                    <button type="button" class="btn btn-default" onclick="addUpload();">アップロード欄を追加</button>
                     
                     <div class="form-group">
                         {!! Form::label('productName', '商品名:') !!}
                         {!! Form::text('productName', null, ['class' => 'form-control']) !!}
+                    </div>
+                    
+                    <div class="form-group">
+                        {!! Form::label('category_id', 'カテゴリ選択:') !!}
+                        {{ Form::select('category_id', $categoryList) }}
                     </div>
                     
                     <div class="form-group">
@@ -42,19 +50,32 @@
                     </div>
 
                     <div class="form-group">
-                        {!! Form::submit('アップロード', ['class' => 'btn btn-default']) !!}
+                        {!! Form::label('stock', '個数:') !!}
+                        {!! Form::text('stock', null, ['class' => 'form-control']) !!}
                     </div>
                     
                     <div class="form-group">
+                        {!! Form::submit('アップロード', ['class' => 'btn btn-default']) !!}
+                    </div>
+                    {!! Form::close() !!}
+                    <div class="form-group">
                         @if ($products)
                             @foreach ($products as $product)
-                                <div style="float:left">
-                                    <img src="{{ asset('storage/image/' . $product->product_image) }}" alt="image" width=100 height=100 />
+                                <div class="imageArea" style="float:left">
+                                    <a href="#" onclick="imgClick();">
+                                        <img src="{{ asset('storage/image/' . $product->product_image) }}" alt="image" width=100 height=100 value="{{ $product->product_image }}" />
+                                    </a>
                                 </div>
                             @endforeach
                         @endif
                     </div>
-                    {!! Form::close() !!}
+                </div>
+                
+                <div class="form-group">                           
+                    <a href="{{ route('display') }}">
+                        商品一覧へ戻る
+                        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+                    </a>
                 </div>
             </div>
         </div>

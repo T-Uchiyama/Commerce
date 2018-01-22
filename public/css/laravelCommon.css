@@ -25,3 +25,37 @@
     height: 40px;
     letter-spacing: .25px;
 }
+
+/**
+ * swiper.js
+ */
+.swiper-container {
+    width: 300px;
+    height: auto;
+    overflow: visible;
+    z-index: 1;
+}
+
+.swiper-button-prev,
+.swiper-button-next {
+    fill: #fff;
+    stroke: none;
+    stroke-width: 0;
+    z-index: 10000;
+    width: 30px;
+    margin-top: -18px;
+    background-image: none;
+}
+
+.swiper-pagination-bullet-active {
+    background: #fff;
+}
+
+@media (min-width: 768px) {
+    .swiper-button-prev,
+    .swiper-button-next {
+        width: auto;
+        margin-top: -22px;
+    }
+}
+

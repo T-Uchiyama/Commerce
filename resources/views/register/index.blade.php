@@ -9,6 +9,15 @@
     @endif
     <div class="row">
         <div class="col-md-8 col-md-offset-2">
+            @if ($errors->any())
+                <div class="alert alert-danger">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>  
+                </div>
+            @endif
             <div class="panel panel-default">
                 <div class="panel-heading">会員登録</div>
                 
@@ -57,6 +66,7 @@
                     <div class="form-group">                           
                         <a href="{{ route('display') }}">
                             商品一覧へ戻る
+                            <i class="fa fa-chevron-right" aria-hidden="true"></i>
                         </a>
                     </div>
                 </div>

@@ -147,8 +147,13 @@ class DisplayController extends Controller
             
         }
 
-        // FIXME:: 今はダイレクトにDB取得しているが既に取得メソッドを記載しているのでそちらから引っ張るようにする。
         $productInfo = DB::table('products')->get();
+        foreach ($productInfo as $product) {
+            $product_id = $product->id;
+            // サムネイル表示は一件のみで問題ないためFirstで取得
+            $productImageInfo = \App\Product::find($product_id)->productImages()->first();
+            $product->product_image = $productImageInfo->product_image;
+        }
         return view('/display/index', compact('productInfo'));
     }
     
@@ -161,9 +166,10 @@ class DisplayController extends Controller
     public function getDetail($id = 0)
     {
         $product = DB::table('products')->where('id', $id)
-                                        ->select('id', 'product_name', 'product_image', 'price', 'stock')
+                                        ->select('id', 'product_name', 'price', 'stock')
                                         ->first();
-        return view('display.detail', compact('product'));
+        $productImageInfo = \App\Product::find($id)->productImages()->get();
+        return view('display.detail', compact('product', 'productImageInfo'));
     }
     
     /**
@@ -248,11 +254,7 @@ class DisplayController extends Controller
                     $productData[0]->number =  $result[$productData[0]->product_image];
                     if ($productData[0]->price != 0) {
                         $productData[0]->subtotal = $productData[0]->price * $result[$productData[0]->product_image];
-                    } else {
-                        //FIXME:: このelseは値が入っていないパターンのために作成。
-                        //        データが正確であれば不要。
-                        $productData[0]->subtotal = 1000 * $result[$productData[0]->product_image];
-                    }
+                    } 
                     $total += $productData[0]->subtotal;
                 }
             }

@@ -18,3 +18,18 @@ window.addEventListener('load', function() {
         // autoplay: 2000
     });
 }, false);
+
+function plus_or_minus(param, limit, pm_flg)
+{
+    if (pm_flg == '+') {
+        param.value++;
+        if (param.value == (limit + 1)) {
+            param.value= limit;
+        }
+    } else {
+        if (param.value > 1) {
+            param.value--;
+        } 
+    }
+
+}

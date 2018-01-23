@@ -48,8 +48,9 @@
                             商品登録
                             <i class="fa fa-chevron-right" aria-hidden="true"></i>
                         </a>
-                        <a href="{{ url('/display/') }}">
-                            商品登録
+                        <a href="{{ route('cart') }}">
+                            ショッピングカート
+                            <i class="fa fa-chevron-right" aria-hidden="true"></i>
                         </a>
                     </div>
                 </div>

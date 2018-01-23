@@ -183,6 +183,55 @@ class DisplayController extends Controller
     }
     
     /**
+     * ショッピングカート一覧の表示
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function getCart()
+    {    
+        $productData = array();
+        $cartData = Session::get('cart');
+        
+        if (!empty($cartData)) {
+            foreach ($cartData as $data) {
+                $productData[] = \App\Product::find($data['product_id'])->productImages()->first();
+            }
+
+            $tmp = [];
+            $uniqueProducts = [];
+            $countArray = [];
+            
+            foreach ($productData as $product) {
+                if (!in_array($product['product_id'], $tmp)) {
+                    $tmp[] = $product['product_id'];
+                    $uniqueProducts[] = $product;
+                } else {
+                    array_push($countArray, $product['product_id']);
+                }
+            }
+            $countArray = array_count_values($countArray);
+            
+            foreach ($uniqueProducts as $key => $value) {
+                foreach ($cartData as $data) {
+                    if($value->product_id == $data['product_id']) {
+                        $value->product_name = $data['name'];
+                        $value->price = $data['price'];
+                        $value->stock = $data['stock'];
+                        if (!empty($countArray) && !empty($countArray[$data['product_id']])) {
+                            $value->added = $data['added'] + $countArray[$data['product_id']];
+                        } else {
+                            $value->added = $data['added'];
+                        }
+                        
+                    }
+                }
+            }
+            $productData = $uniqueProducts;
+        }
+        return view('display.cart', compact('productData'));
+    }
+    
+    /**
      * ショッピングカート追加
      *
      * @param  Request $request リクエストデータ
@@ -197,14 +246,15 @@ class DisplayController extends Controller
                 $request->session()->put('cart', array());
             } 
             $product = DB::table('products')->where('id', $id)
-                                            ->select('product_name', 'price')
+                                            ->select('product_name', 'price', 'stock')
                                             ->first();
-            
+                                            
             $request->session()->push('cart', array(
-                'id' => $id,
+                'product_id' => $id,
                 'name' => $product->product_name,
                 'price' => $product->price,
-                'stock' => 1,
+                'stock' => $product->stock,
+                'added' => 1,
             ));
 
             return redirect()->action('DisplayController@getDetail', ['id' => $id])
@@ -274,12 +324,18 @@ class DisplayController extends Controller
      */
     public function emptyCart(Request $request, $id)
     {
+        $sessionData = $request->session()->get('cart');
+
+        foreach ($sessionData as $key => $value) {
+            if ($value['product_id'] == $id) {
+                unset($sessionData[$key]);
+            }
+        }
+
         $request->session()->forget('cart');
-        $request->session()->forget('total');
-        $request->session()->forget('number');
-        return redirect()->action(
-            'DisplayController@shop', ['id' => $id]
-        );
+        $request->session()->put('cart', $sessionData);
+
+        return redirect()->action('DisplayController@getCart');
     }
     
     /**

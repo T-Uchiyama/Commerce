@@ -29,7 +29,7 @@ class ProductController extends Controller
     public function upload(Request $request)
     {
         if (!Auth::check()) {
-            return view('register.index')->withErrors(['notLogin' => 'ログインしてください']);
+            return view('register.index')->withErrors(['notLogin' => '商品登録のためにはログインしてください']);
         }
         
         $this->validate($request, [

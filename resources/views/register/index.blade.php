@@ -19,7 +19,7 @@
                 </div>
             @endif
             <div class="panel panel-default">
-                <div class="panel-heading">会員登録</div>
+                <div class="panel-heading">Register Member</div>
                 
                 <div class="panel-body">
                     <div class="form-group">

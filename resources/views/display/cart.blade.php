@@ -53,15 +53,14 @@
                     </div>
                     
                     <div class="form-group">
-                        <form action="{{ url('/display/checkout')}}" method="POST" class="form-horizontal">
-                            {{ csrf_field() }}
-                            <button type="submit" class="btn btn-info">
-                                レジに進む
-                            </button>
-                        </form>
+                        <a href="{{ route('checkout') }}">
+                            レジに進む
+                            <i class="fa fa-chevron-right" aria-hidden="true"></i>
+                        </a>
                         
                         <a href="{{ route('display') }}">
                             商品一覧へ戻る
+                            <i class="fa fa-chevron-right" aria-hidden="true"></i>
                         </a>
                     </div>
                 </div>

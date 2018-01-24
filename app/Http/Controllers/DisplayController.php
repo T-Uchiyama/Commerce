@@ -9,6 +9,7 @@ use App\User;
 use Session;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Carbon\Carbon;
 
 use Illuminate\Support\Facades\Mail;
 use App\Mail\OrderShipped;
@@ -183,6 +184,22 @@ class DisplayController extends Controller
     }
     
     /**
+     * レジ画面の表示
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function getCheckout(Request $request)
+    {
+        $productData = array();
+        $cartData = $request->session()->get('cart');
+        
+        $productData = $this->combineSessionArray($cartData);
+        $total = $request->session()->get('total');
+    
+        return view('display.checkout', compact('productData', 'total'));
+    }
+    
+    /**
      * ショッピングカート一覧の表示
      * 
      * @return \Illuminate\Http\Response
@@ -192,42 +209,8 @@ class DisplayController extends Controller
         $productData = array();
         $cartData = Session::get('cart');
         
-        if (!empty($cartData)) {
-            foreach ($cartData as $data) {
-                $productData[] = \App\Product::find($data['product_id'])->productImages()->first();
-            }
-
-            $tmp = [];
-            $uniqueProducts = [];
-            $countArray = [];
-            
-            foreach ($productData as $product) {
-                if (!in_array($product['product_id'], $tmp)) {
-                    $tmp[] = $product['product_id'];
-                    $uniqueProducts[] = $product;
-                } else {
-                    array_push($countArray, $product['product_id']);
-                }
-            }
-            $countArray = array_count_values($countArray);
-            
-            foreach ($uniqueProducts as $key => $value) {
-                foreach ($cartData as $data) {
-                    if($value->product_id == $data['product_id']) {
-                        $value->product_name = $data['name'];
-                        $value->price = $data['price'];
-                        $value->stock = $data['stock'];
-                        if (!empty($countArray) && !empty($countArray[$data['product_id']])) {
-                            $value->added = $data['added'] + $countArray[$data['product_id']];
-                        } else {
-                            $value->added = $data['added'];
-                        }
-                        
-                    }
-                }
-            }
-            $productData = $uniqueProducts;
-        }
+        $productData = $this->combineSessionArray($cartData);
+        
         return view('display.cart', compact('productData'));
     }
     
@@ -263,58 +246,6 @@ class DisplayController extends Controller
     }
     
     /**
-     * Show the application dashboard.
-     *
-     * @param  Request $request リクエストデータ
-     * @param  integer $id 商品ID
-     * @return \Illuminate\Http\Response
-     */
-    public function shop(Request $request, $id = 0)
-    {
-        $productInfo = array();
-        $total = 0;
-        if ($request->isMethod('post')) {
-            // セッションにカート追加
-            if (!$request->session()->has('cart')) {
-                $request->session()->put('cart', array());
-            } 
-            $request->session()->push('cart', $id);
-            $sessionArr = $request->session()->get('cart');
-            
-            for ($i = 0; $i < count($sessionArr); $i++) {
-                array_push($productInfo, DB::table('products')->where('id', $sessionArr[$i])
-                                                              ->select('id', 'product_image', 'price', 'product_name')
-                                                              ->get());
-            }
-            
-            //ObjectをArrayにキャスト
-            $productArr = json_decode(json_encode($productInfo), true);
-            
-            $array = array();
-            foreach ($productArr as $productData) {
-                array_push($array, $productData[0]['product_image']);
-            }
-            $result = array_count_values($array);
-            $request->session()->put('number', $result);
-            $productInfo = array_unique($productInfo);
-
-            // productInfoに個数と小計項目を追加
-            foreach ($productInfo as $productData) {
-                if (array_key_exists($productData[0]->product_image, $result)) {
-                    $productData[0]->number =  $result[$productData[0]->product_image];
-                    if ($productData[0]->price != 0) {
-                        $productData[0]->subtotal = $productData[0]->price * $result[$productData[0]->product_image];
-                    } 
-                    $total += $productData[0]->subtotal;
-                }
-            }
-            $request->session()->put('total', $total);
-        }
-        $page_id = $id;
-        $total = $request->session()->get('total', 0);
-        return view('/display/shop', compact('productInfo', 'page_id', 'total'));
-    }
-    /**
      * カートを空にする。
      * 
      * @param  Request $request リクエストデータ
@@ -342,42 +273,120 @@ class DisplayController extends Controller
      * 購入手続き(メール送信し購入内容をユーザーに)
      * 
      * @param  Request $request リクエストデータ
-     * @param   $id      商品ID
      * 
      * @return  \Illuminate\Http\Response
      */
-    public function purchase(Request $request, $id)
+    public function purchase(Request $request)
     {
-        $idArr = $request->session()->get('cart');
-        $numStr = $request->session()->get('number');
+        if (!Auth::check()) {
+            return view('register.index')->withErrors(['notLogin' => '商品購入のためにはログインしてください']);
+        }
+        
+        $this->validate($request, [
+            'destination_name' => 'required',
+            'postal_code'      => 'numeric|required',
+            'prefecture'       => 'required',
+            'address1'         => 'required',
+            'address2'         => 'required',
+            'address3'         => 'required',
+            'payment_type'     => 'required',
+        ]);
+        $productData = array();
+        $orderDetailData = array();
+        $paymentTypeArr = array(
+            1 => 'クレジット決済', 
+            2 => '代引き',
+            3 => 'コンビニ決済'
+        );
+        
+        $order_status = 1;
+        $cartData = $request->session()->get('cart');
         $total = $request->session()->get('total');
-        $request->session()->put('purchased', array());
-        for ($i = 0; $i < count($idArr); $i++) {
-            $request->session()->push('purchased', $idArr[$i]);
-        }
-        $purchaseNum = Session::get('purchased', '');
         
+        $productData = $this->combineSessionArray($cartData);
+        
+        $address = $request->prefecture . $request->address1 . $request->address2 . $request->address3;
+        $postal_code = $request->postal_code;
         $item = '';
-        foreach (array_unique($purchaseNum) as $key) {
-            $product = DB::table('products')->where('id', $key)
-                                            ->select('product_image', 'product_name', 'price')
-                                            ->first();
-            $item = $item . $product->product_name . ' × ' . 
-                    $numStr[$product->product_image] . "\t" . '計: ' . $product->price * $numStr[$product->product_image] .
-                    ',' . PHP_EOL;
+        
+        foreach ($productData as $product) {
+            $stockData = DB::table('products')->where('id', $product->product_id)->first();
+            
+            if ($stockData->stock > $product->added) {
+                $orderDetailData[] = array(
+                    'product_id'   => $product->product_id, 
+                    'price'        => $product->price,
+                    'product_name' => $product->product_name,
+                    'purchase_num' => $product->added,
+                    'remain'       => $stockData->stock - $product->added,
+                );
+                $order_status = 2;
+                
+                $item = $item . $product->product_name . ' : ' . $product->price . ' × ' .
+                        $product->added . "\t" . '計: ' . $product->price * $product->added . ',' . PHP_EOL;
+            } else {
+                return redirect()->action('DisplayController@getCheckout')
+                                 ->withErrors( ['stock_shortages' => '大変申し訳ございません。ご購入希望商品の在庫が不足しております。']);     
+            }
         }
         
+        $purchase_content = 'お買い上げ商品: ' . PHP_EOL . $item .
+                            '合計金額: ' . $total . PHP_EOL .
+                            '支払い方法: ' . $paymentTypeArr[$request->payment_type] . PHP_EOL .
+                            '郵便番号: ' . $request->postal_code . PHP_EOL .
+                            'お届け先住所: ' . $request->prefecture .
+                                             $request->address1 . 
+                                             $request->address2 . 
+                                             $request->address3 .PHP_EOL;
+        
+         $lastInsertId = DB::table('orders')->insertGetId([
+             'user_id'   => \Auth::id(), 
+             'purchase_content' => $purchase_content,
+             'total_price' => $total,
+             'payment_type' => $request->payment_type,
+             'address' => $request->prefecture . $request->address1 . $request->address2 . $request->address3,
+             'postal_code' => $request->postal_code,
+             'order_status' => $order_status,
+             'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+             'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+         ]);
+
+         foreach ($orderDetailData as $key => $value) {
+             DB::table('order_details')->insert([
+                 'order_id' => $lastInsertId,
+                 'product_id' => $value['product_id'], 
+                 'price' => $value['price'], 
+                 'product_name' => $value['product_name'],
+                 'purchase_num' => $value['purchase_num'],
+                 'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+                 'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+             ]);
+             DB::table('products')->where('id', $value['product_id'])->update(['stock' => $value['remain']]);
+         }
+
+
         // プレーンテキストタイプでは改行が表示されないのはLaravelの仕様とのこと。
         $data = array(
-            'Content' => '今回お買い上げの商品は' . PHP_EOL . $item  . PHP_EOL .
+            'Content' => \Auth::user()->name . '様' . PHP_EOL .
+                         '-------------------------------------------------------------------------' . PHP_EOL .
+                         '今回お買い上げの商品は' . PHP_EOL . $item .
                          '合計金額は' . $total . '円です。' . PHP_EOL .
+                         '-------------------------------------------------------------------------' . PHP_EOL .
+                         'お届け先 :' . "\t" . $request->destination_name . PHP_EOL .
+                          "\t" . $request->postal_code . PHP_EOL .
+                          "\t" . $request->prefecture . $request->address1 . $request->address2 . $request->address3 . PHP_EOL .
+                         '支払い方法: ' . $paymentTypeArr[$request->payment_type] . PHP_EOL .
+                         '-------------------------------------------------------------------------' . PHP_EOL .
                          'お買い上げありがとうございました。'
         );
+        
         $request->session()->put('mail_content', $data);
         Mail::to(\Auth::user()->email)->send(new OrderShipped($request));
         $request->session()->forget('cart');
         $request->session()->forget('total');
-        $request->session()->forget('number');
+        
+        $order_status = 3;
+        DB::table('orders')->where('id', $lastInsertId)->update(['order_status' => $order_status, 'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),]);
         return redirect()->action('DisplayController@index')
                          ->with('status', 'Send Mail!!');        
     }
@@ -410,5 +419,58 @@ class DisplayController extends Controller
             ])));
         }
         $this->guard()->login($user);
+    }
+    /**
+     * 同じ項目を結合させ、ショッピングカートデータに情報を付随
+     * 
+     * @param   $cartData ショッピングカートデータ
+     * 
+     * @return $uniqueProducts 単一化したショッピングカートデータ
+     */
+    public function combineSessionArray($cartData)
+    {
+        if (!empty($cartData)) {
+            $total = 0;
+            foreach ($cartData as $data) {
+                $productData[] = \App\Product::find($data['product_id'])->productImages()->first();
+                $total += $data['price'];
+            }
+
+            $tmp = [];
+            $uniqueProducts = [];
+            $countArray = [];
+            
+            foreach ($productData as $product) {
+                if (!in_array($product['product_id'], $tmp)) {
+                    $tmp[] = $product['product_id'];
+                    $uniqueProducts[] = $product;
+                } else {
+                    array_push($countArray, $product['product_id']);
+                }
+            }
+            $countArray = array_count_values($countArray);
+            
+            foreach ($uniqueProducts as $key => $value) {
+                foreach ($cartData as $data) {
+                    if($value->product_id == $data['product_id']) {
+                        $value->product_name = $data['name'];
+                        $value->price = $data['price'];
+                        $value->stock = $data['stock'];
+                        if (!empty($countArray) && !empty($countArray[$data['product_id']])) {
+                            $value->added = $data['added'] + $countArray[$data['product_id']];
+                        } else {
+                            $value->added = $data['added'];
+                        }
+                        
+                    }
+                }
+            }
+            // セッションに合計金額格納
+            Session::put('total', $total);
+            
+            return $uniqueProducts;
+        } else {
+            return array();
+        }
     }
 }

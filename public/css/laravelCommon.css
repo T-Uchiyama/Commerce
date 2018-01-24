@@ -59,3 +59,8 @@
     }
 }
 
+a.disabled {
+    pointer-events: none;
+    color: #beb7b4;
+}
+

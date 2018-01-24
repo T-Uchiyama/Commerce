@@ -53,10 +53,17 @@
                     </div>
                     
                     <div class="form-group">
+                        @if(!empty($productData))
                         <a href="{{ route('checkout') }}">
                             レジに進む
                             <i class="fa fa-chevron-right" aria-hidden="true"></i>
                         </a>
+                        @else
+                        <a href="{{ route('checkout') }}" class="disabled" tabindex="-1">
+                            レジに進む
+                            <i class="fa fa-chevron-right" aria-hidden="true"></i>
+                        </a>
+                        @endif
                         
                         <a href="{{ route('display') }}">
                             商品一覧へ戻る

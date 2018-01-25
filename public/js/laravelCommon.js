@@ -24,12 +24,27 @@ function plus_or_minus(param, limit, pm_flg)
     if (pm_flg == '+') {
         param.value++;
         if (param.value == (limit + 1)) {
-            param.value= limit;
+            param.value = limit;
         }
     } else {
         if (param.value > 1) {
             param.value--;
         } 
     }
-
+    
+    $.ajax({
+        url: '/display/changeCartNum',
+        type: 'POST',
+        dataType: 'json',
+        data: {product_name:param.id , added: param.value}
+    })
+    .done(function(e) {
+        console.log(e);
+    })
+    .fail(function() {
+        console.log("error");
+    })
+    .always(function() {
+        console.log("complete");
+    });
 }

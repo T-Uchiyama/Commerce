@@ -256,10 +256,18 @@ class DisplayController extends Controller
     public function emptyCart(Request $request, $id)
     {
         $sessionData = $request->session()->get('cart');
+        $changeNumData = $request->session()->get('changeCart');
 
         foreach ($sessionData as $key => $value) {
             if ($value['product_id'] == $id) {
                 unset($sessionData[$key]);
+                // ショッピングカート一覧の増減ボタンで購入個数を変更している場合は合わせて削除
+                if (array_key_exists($value['name'], $changeNumData)) {
+                    unset($changeNumData[$value['name']]);
+                    
+                    $request->session()->forget('changeCart');
+                    $request->session()->put('cart', $changeNumData);
+                }
             }
         }
 
@@ -384,6 +392,7 @@ class DisplayController extends Controller
         Mail::to(\Auth::user()->email)->send(new OrderShipped($request));
         $request->session()->forget('cart');
         $request->session()->forget('total');
+        $request->session()->forget('changeCart');
         
         $order_status = 3;
         DB::table('orders')->where('id', $lastInsertId)->update(['order_status' => $order_status, 'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),]);
@@ -433,12 +442,12 @@ class DisplayController extends Controller
             $total = 0;
             foreach ($cartData as $data) {
                 $productData[] = \App\Product::find($data['product_id'])->productImages()->first();
-                $total += $data['price'];
             }
 
             $tmp = [];
             $uniqueProducts = [];
             $countArray = [];
+            $sessionData = Session::get('changeCart');
             
             foreach ($productData as $product) {
                 if (!in_array($product['product_id'], $tmp)) {
@@ -461,9 +470,12 @@ class DisplayController extends Controller
                         } else {
                             $value->added = $data['added'];
                         }
-                        
+                        if (!empty($sessionData) && array_key_exists($data['name'], $sessionData)) {
+                            $value->added = $sessionData[$data['name']];
+                        }
                     }
                 }
+                $total +=  $value->price * $value->added;
             }
             // セッションに合計金額格納
             Session::put('total', $total);
@@ -472,5 +484,45 @@ class DisplayController extends Controller
         } else {
             return array();
         }
+    }
+    
+    /**
+     * ボタン押下によるショッピングカートの増減結果をセッションで保持
+     *
+     * @param Request $request リクエストデータ
+     * 
+     * @return 増減結果をまとめたレスポンスデータ
+     */
+    public function changeCartNum(Request $request)
+    {
+        //  セッションにカート変更情報が存在するかチェック
+        if (!$request->session()->has('changeCart')) {
+            $request->session()->put('changeCart', array());
+        }
+        // セッション内にデータが存在しているかチェック
+        if (!empty($request->session()->get('changeCart'))) {
+            $sessionData = $request->session()->get('changeCart');
+            
+            if (array_key_exists($request->input('product_name'), $sessionData)) {
+                // 既に配列に保存されている場合は値のみを修正
+                $sessionData = array_merge($sessionData, array(
+                    $request->input('product_name') => $request->input('added'),
+                ));
+            } else {
+                // 配列が存在しているが、キーが存在しない場合は配列に追記
+                $sessionData += array(
+                    $request->input('product_name') => $request->input('added'),
+                );
+            }
+            $request->session()->forget('changeCart');
+            $request->session()->put('changeCart', $sessionData);
+        } else {
+            // 新規の場合にはデータを特に変化させることなく格納
+            $request->session()->put('changeCart', array(
+                $request->input('product_name') => $request->input('added'),
+            ));
+        }
+        
+        return json_encode($request->session()->get('changeCart'));        
     }
 }

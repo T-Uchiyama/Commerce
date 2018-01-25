@@ -34,7 +34,7 @@
                                         <th>
                                             {!! Form::open() !!}
                                                 <input type=button value="-" onClick="plus_or_minus(this.form.product_purchased, {{ $product->stock }} , '-');">
-                                                <input type=text name="product_purchased" value="{{ $product->added }}" size=4 readonly="readonly">
+                                                <input type=text id="{{ $product->product_name }}" name="product_purchased" value="{{ $product->added }}" size=4 readonly="readonly">
                                                 <input type=button value="＋" onClick="plus_or_minus(this.form.product_purchased, {{ $product->stock }} , '+');">
                                             {!! Form::close() !!}
                                         </th>

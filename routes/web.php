@@ -32,6 +32,7 @@ Route::post('/display/emptyCart/{id}', 'DisplayController@emptyCart');
 Route::get('/display/cart', 'DisplayController@getCart')->name('cart');
 Route::get('/display/checkout', 'DisplayController@getCheckout')->name('checkout');
 Route::post('/display/checkout', 'DisplayController@purchase');
+Route::post('/display/changeCartNum', 'DisplayController@changeCartNum');
 
 Route::get('/regist_member', 'DisplayController@getRegistMember')->name('regist_member');
 

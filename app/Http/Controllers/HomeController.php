@@ -33,18 +33,13 @@ class HomeController extends Controller
     
     public function userInfo()
     {
-        $userMasterData = DB::table('users')->get();
+        $userMasterData = $this->getUserMasterData();
         return view('admin.user', compact('userMasterData'));
     }
     
     public function productInfo()
     {
-        $productMasterData = DB::table('products')->get();
-        
-        foreach ($productMasterData as $key => $value) {
-            $productMasterData[$key]->product_image = \App\Product::find($value->id)->productImages()->first()->product_image;
-        }
-
+        $productMasterData = $this->getProductMasterData();
         return view('admin.product', compact('productMasterData'));
     }
     

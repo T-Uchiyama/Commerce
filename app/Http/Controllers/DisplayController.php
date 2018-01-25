@@ -10,6 +10,7 @@ use Session;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Carbon\Carbon;
+use App\Traits\DataAcquisition;
 
 use Illuminate\Support\Facades\Mail;
 use App\Mail\OrderShipped;
@@ -28,6 +29,7 @@ class DisplayController extends Controller
         AuthenticatesUsers::guard insteadof RegistersUsers; 
         AuthenticatesUsers::redirectPath insteadof RegistersUsers; 
     }
+    use DataAcquisition;
     
     /**
      * Where to redirect users after registration.
@@ -148,13 +150,7 @@ class DisplayController extends Controller
             
         }
 
-        $productInfo = DB::table('products')->get();
-        foreach ($productInfo as $product) {
-            $product_id = $product->id;
-            // サムネイル表示は一件のみで問題ないためFirstで取得
-            $productImageInfo = \App\Product::find($product_id)->productImages()->first();
-            $product->product_image = $productImageInfo->product_image;
-        }
+        $productInfo = $this->getProductList();
         return view('/display/index', compact('productInfo'));
     }
     
@@ -166,9 +162,7 @@ class DisplayController extends Controller
      */
     public function getDetail($id = 0)
     {
-        $product = DB::table('products')->where('id', $id)
-                                        ->select('id', 'product_name', 'price', 'stock')
-                                        ->first();
+        $product = $this->getProductList($id);
         $productImageInfo = \App\Product::find($id)->productImages()->get();
         return view('display.detail', compact('product', 'productImageInfo'));
     }
@@ -228,10 +222,8 @@ class DisplayController extends Controller
             if (!$request->session()->has('cart')) {
                 $request->session()->put('cart', array());
             } 
-            $product = DB::table('products')->where('id', $id)
-                                            ->select('product_name', 'price', 'stock')
-                                            ->first();
-                                            
+            $product = $this->getProductList($id);
+                           
             $request->session()->push('cart', array(
                 'product_id' => $id,
                 'name' => $product->product_name,
@@ -318,7 +310,7 @@ class DisplayController extends Controller
         $item = '';
         
         foreach ($productData as $product) {
-            $stockData = DB::table('products')->where('id', $product->product_id)->first();
+            $stockData = $this->getProductList($product->product_id);
             
             if ($stockData->stock > $product->added) {
                 $orderDetailData[] = array(

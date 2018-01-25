@@ -32,4 +32,40 @@ trait DataAcquisition
 
         return $productInfo;
     }
+    
+    /**
+     * カテゴリ情報の取得
+     * 
+     * @return DB::table('categories') カテゴリ情報
+     */
+    public function getCategoryData()
+    {    
+        return DB::table('categories')->pluck('name', 'id');
+    }
+    
+    /**
+     * ユーザー情報を全件取得
+     * 
+     * @return DB::table('users')
+     */
+    public function getUserMasterData()
+    {
+        return DB::table('users')->get();
+    }
+    
+    /**
+     * 商品情報を全件取得
+     * 
+     * @return DB::table('products')
+     */
+    public function getProductMasterData()
+    {
+        $productMasterData = DB::table('products')->get();
+
+        foreach ($productMasterData as $key => $value) {
+            $productMasterData[$key]->product_image = \App\Product::find($value->id)->productImages()->first()->product_image;
+        }
+        
+        return $productMasterData;
+    }
 }

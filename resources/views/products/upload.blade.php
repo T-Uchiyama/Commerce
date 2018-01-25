@@ -58,11 +58,16 @@
                         {!! Form::submit('アップロード', ['class' => 'btn btn-default']) !!}
                     </div>
                     {!! Form::close() !!}
+                    
+                    <div class="form-group" align="center">
+                        {!! Form::label('infomation', '既に登録されている在庫を更新する場合には下記のサムネイルをクリック') !!}
+                    </div>
+
                     <div class="form-group">
                         @if ($products)
                             @foreach ($products as $product)
                                 <div class="imageArea" style="float:left">
-                                    <a href="#" onclick="imgClick();">
+                                    <a href="{{ route('edit', $product->id) }}">
                                         <img src="{{ asset('storage/image/' . $product->product_image) }}" alt="image" width=100 height=100 value="{{ $product->product_image }}" />
                                     </a>
                                 </div>

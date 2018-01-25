@@ -23,6 +23,20 @@ class ProductController extends Controller
     }
     
     /**
+     * 編集画面へ遷移
+     *
+     * @param  $id 商品ID
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function getEdit($id = 0)
+    {
+        $product = $this->getProductList($id);
+
+        return view('products.edit', compact('product'));
+    }
+    
+    /**
      * ファイルアップロード処理
      * @param  Request $request リクエストデータ
      */
@@ -69,7 +83,7 @@ class ProductController extends Controller
                 $product->productImages()->create($data);
             }
              
-             return redirect('/product')->with('success', '保存しました。');
+             return redirect('/product')->with('status', '保存しました。');
          } else {
              return redirect()
                     ->back()
@@ -79,17 +93,53 @@ class ProductController extends Controller
     }
     
     /**
+     * 商品情報を修正する
+     * 
+     * @param  Request $request リクエストデータ
+     * @param  integer $id      商品ID
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function edit(Request $request, $id = 0)
+    {
+        if (!Auth::check()) {
+            return view('register.index')->withErrors(['notLogin' => '商品情報編集のためにはログインしてください']);
+        }
+        
+        $product = \App\Product::find($id);
+        $product->price = $request->price;
+        $product->stock = $request->stock;
+        
+        if($product->save()) {
+            return redirect('product')->with('status', '編集しました。'); 
+        } else {
+            return redirect()
+                   ->back()
+                   ->withInput()
+                   ->withErrors(['edit' => '保存に失敗しました。']);
+        }
+    }
+    
+    /**
      * 商品リスト全件取得
+     *
+     * @param $id 商品ID
+     * 
      * @return List ProductInfo
      */
-    public function getProductList()
+    public function getProductList($id = 0)
     {
-        $productInfo = DB::table('products')->get();
-        foreach ($productInfo as $product) {
-            $product_id = $product->id;
-            // サムネイル表示は一件のみで問題ないためFirstで取得
-            $productImageInfo = \App\Product::find($product_id)->productImages()->first();
-            $product->product_image = $productImageInfo->product_image;
+        if ($id == 0) {
+            $productInfo = DB::table('products')->get();
+            foreach ($productInfo as $product) {
+                $product_id = $product->id;
+                // サムネイル表示は一件のみで問題ないためFirstで取得
+                $productImageInfo = \App\Product::find($product_id)->productImages()->first();
+                $product->product_image = $productImageInfo->product_image;
+            }
+        } else {
+            $productInfo = DB::table('products')->where('id', $id)->first();
+            $productInfo->product_image = \App\Product::find($id)->productImages()->first()->product_image;                                                 
         }
 
         return $productInfo;

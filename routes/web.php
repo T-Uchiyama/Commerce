@@ -20,11 +20,13 @@ Auth::routes();
 Route::get('/home', 'HomeController@index')->name('home');
 Route::get('/user_info', 'HomeController@userInfo')->name('user_info');
 Route::get('/product_info', 'HomeController@productInfo')->name('product_info');
+Route::get('/product_info/edit/{id}', 'HomeController@showProductEditForm')->name('master.edit');
+Route::post('/product_info/edit/{id}', 'HomeController@ProductMasterEdit');
 
 Route::get('/product', 'ProductController@index')->name('product');
 Route::post('/product/upload', 'ProductController@upload');
 Route::get('/product/edit/{id}', 'ProductController@getEdit')->name('edit');
-Route::post('/product/edit/{id}', 'ProductController@edit')->name('edit');
+Route::post('/product/edit/{id}', 'ProductController@edit');
 
 Route::get('/display', 'DisplayController@index')->name('display');
 Route::get('/display/detail/{id}', 'DisplayController@getDetail');

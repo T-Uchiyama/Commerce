@@ -14,24 +14,34 @@
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>Name</th>
                                     <th>ImageName</th>
+                                    <th>Name</th>
                                     <th>Price</th>
                                     <th>Stock</th>
                                     <th>Created_At</th>
                                     <th>Updated_At</th>
+                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach ($productMasterData as $masterData)
                                     <tr>
                                         <th>{{ $masterData->id }}</th>
+                                        <th>
+                                            <img src="{{ asset('storage/image/' . $masterData->product_image) }}" alt="image" width=100 height=100 value="{{ $masterData->product_image }}" />
+                                        </th>
                                         <th>{{ $masterData->product_name }}</th>
-                                        <th>{{ $masterData->product_image }}</th>
                                         <th>{{ $masterData->price }}円</th>
                                         <th>{{ $masterData->stock }}個</th>
                                         <th>{{ $masterData->created_at  }}</th>
                                         <th>{{ $masterData->updated_at }}</th>
+                                        <th>
+                                            {!! Form::open(['url' => route('master.edit', $masterData->id), 'method' => 'get']) !!}
+                                                    <button type="submit" class="btn btn-info">
+                                                        データ編集
+                                                    </button>
+                                            {!! Form::close() !!}
+                                        </th>
                                     </tr>
                                 @endforeach
                             </tbody>

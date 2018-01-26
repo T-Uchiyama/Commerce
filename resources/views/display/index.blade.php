@@ -12,6 +12,17 @@
             <div class="panel panel-default">
                 <div class="panel-heading">Display Screen</div>
                 <div class="panel-body">
+                    {{ Form::label('search', 'Search Form') }}
+                    <div id="search-area">
+                        {{ Form::open(['method' => 'GET', 'url' => route('search')] ) }}
+                        {{ Form::select('category_id', $categoryList, null, ['id' => 'category_id', 'placeholder' => 'すべてのカテゴリ']) }}
+                        {{ Form::text('search_text', null, ['id' => 'search_text']) }}
+                        <button type="submit" class="btn btn-success" id="search_Button">
+                            <i class="fa fa-search" aria-hidden="true"></i>
+                        </button>
+                        
+                        {{ Form::close() }}
+                    </div>
                     <div class="table-responsive">
                         <table class="table table-condensed">
                             <thead>

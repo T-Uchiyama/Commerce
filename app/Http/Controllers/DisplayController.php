@@ -6,6 +6,7 @@ use App\Display;
 use Auth;
 use DB;
 use App\User;
+use App\Product;
 use Session;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -151,7 +152,8 @@ class DisplayController extends Controller
         }
 
         $productInfo = $this->getProductList();
-        return view('/display/index', compact('productInfo'));
+        $categoryList = $this->getCategoryData();
+        return view('display.index', compact('productInfo', 'categoryList'));
     }
     
     /**
@@ -516,5 +518,43 @@ class DisplayController extends Controller
         }
         
         return json_encode($request->session()->get('changeCart'));        
+    }
+    
+    /**
+     * 検索文字を取得しクエリを用い検索結果の表示
+     * @param  Request $request リクエストデータ
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function getQuerySearch(Request $request)
+    {
+        $categoryId = $request->category_id;
+        $searchText = $request->search_text;
+        
+        $productInfo = $this->getProductList();
+        $categoryList = $this->getCategoryData();
+        $paginate_flg = false;
+        if (!empty($categoryId) && !empty($searchText)) {
+            $productInfo = \App\Product::where('category_id', $categoryId)
+                                        ->orWhere('product_name', 'LIKE', "%$searchText%")
+                                        ->paginate(10);
+            $paginate_flg = true;
+        } else if (!empty($categoryId) && empty($searchText)) {
+            $productInfo = \App\Product::where('category_id', $categoryId)
+                                        ->paginate(10);
+            $paginate_flg = true;
+        } else if (empty($categoryId) && !empty($searchText)) {
+            $productInfo = \App\Product::where('product_name', 'LIKE', "%$searchText%")
+                                        ->paginate(10);
+            $paginate_flg = true;
+        }
+        
+        if($paginate_flg) {
+            foreach ($productInfo as $key => $value) {
+                $productInfo[$key]->product_image = \App\Product::find($value->id)->productImages()->first()->product_image; 
+            }
+        }
+
+        return view('display.index', compact('productInfo', 'categoryList'));
     }
 }

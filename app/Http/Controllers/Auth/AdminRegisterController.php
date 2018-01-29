@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Administrator;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Foundation\Auth\RegistersAdminUsers;
+use Illuminate\Foundation\Auth\RegistersUsers;
 
 class AdminRegisterController extends Controller
 {
@@ -20,7 +20,7 @@ class AdminRegisterController extends Controller
     |
     */
 
-    use RegistersAdminUsers;
+    use RegistersUsers;
 
     /**
      * Where to redirect users after registration.
@@ -39,6 +39,16 @@ class AdminRegisterController extends Controller
         $this->middleware('guest');
     }
 
+    /**
+     * Show the application's login form.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function showRegistrationForm()
+    {
+        return view('admin.register');
+    }
+    
     /**
      * Get a validator for an incoming registration request.
      *

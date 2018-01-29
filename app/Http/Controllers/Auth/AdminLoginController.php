@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers\Auth;
 
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
-use Illuminate\Foundation\Auth\AuthenticatesAdminUsers;
+use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Abraham\TwitterOAuth\TwitterOAuth;
 use Session;
 
@@ -19,8 +20,7 @@ class AdminLoginController extends Controller
     | to conveniently provide its functionality to your applications.
     |
     */
-
-    use AuthenticatesAdminUsers;
+    use AuthenticatesUsers;
 
     /**
      * Where to redirect users after login.
@@ -37,6 +37,26 @@ class AdminLoginController extends Controller
     public function __construct()
     {
         $this->middleware('guest:admin')->except('logout');
+    }
+    
+    /**
+     * Show the application's login form.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function showLoginForm()
+    {
+        return view('admin.login');
+    }
+    
+    /**
+     * Get the guard to be used during authentication.
+     *
+     * @return \Illuminate\Contracts\Auth\StatefulGuard
+     */
+    protected function guard()
+    {
+        return Auth::guard('admin');
     }
     
 }

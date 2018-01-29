@@ -52,6 +52,12 @@
                         <a href="{{ route('home') }}">
                             管理者トップページに戻る
                         </a>
+                        {!! Form::open(['url' => route('csv'), 'method' => 'post']) !!}
+                            {!! csrf_field() !!}
+                            <button type="submit" class="btn btn-info">
+                                CSVダウンロード
+                            </button>
+                        {!! Form::close() !!}
                     </div>
                 </div>
             </div>

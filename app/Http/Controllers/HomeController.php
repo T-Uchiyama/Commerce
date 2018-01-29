@@ -6,6 +6,7 @@ use DB;
 use App\Product;  
 use App\Traits\DataAcquisition;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class HomeController extends Controller
 {
@@ -86,5 +87,36 @@ class HomeController extends Controller
                    ->withInput()
                    ->withErrors(['edit' => '保存に失敗しました。']);
         }
+    }
+    
+    /**
+     * 商品情報をCSV形式でエクスポート
+     * 
+     * @return Symfony\Component\HttpFoundation\StreamedResponse
+     */
+    public function downloadCSV()
+    {
+        return  new StreamedResponse(
+            function () {
+                $stream = fopen('php://output', 'w');
+                DB::table('products')->orderBy('id')->chunk(100, function ($products) use ($stream) {
+                    foreach ($products as $product) {
+                        fputcsv($stream, [
+                            $product->id,
+                            $product->category_id, 
+                            $product->product_name,
+                            $product->price, 
+                            $product->stock
+                        ]);
+                    }
+                });
+                fclose($stream);
+            },
+            200,
+            [
+                'Content-Type' => 'text/csv',
+                'Content-Disposition' => 'attachment; filename="productAll.csv"',
+            ]
+        );
     }
 }

@@ -18,7 +18,7 @@ trait DataAcquisition
     public function getProductList($id = 0)
     {
         if ($id == 0) {
-            $productInfo = DB::table('products')->get();
+            $productInfo = DB::table('products')->paginate(10);
             foreach ($productInfo as $product) {
                 $product_id = $product->id;
                 // サムネイル表示は一件のみで問題ないためFirstで取得

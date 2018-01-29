@@ -64,6 +64,11 @@
                             <i class="fa fa-chevron-right" aria-hidden="true"></i>
                         </a>
                     </div>
+                    @if($productInfo)
+                        <div class="pagination-bar text-center">
+                               {{ $productInfo->appends(Request::only('category_id', 'search_text'))->links() }}
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

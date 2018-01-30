@@ -151,7 +151,7 @@ class DisplayController extends Controller
             
         }
 
-        $productInfo = $this->getProductList();
+        $productInfo = $this->getProductPaginate();
         $categoryList = $this->getCategoryData();
         return view('display.index', compact('productInfo', 'categoryList'));
     }
@@ -531,7 +531,7 @@ class DisplayController extends Controller
         $categoryId = $request->category_id;
         $searchText = $request->search_text;
         
-        $productInfo = $this->getProductList();
+        $productInfo = $this->getProductPaginate();
         $categoryList = $this->getCategoryData();
         $paginate_flg = false;
         if (!empty($categoryId) && !empty($searchText)) {

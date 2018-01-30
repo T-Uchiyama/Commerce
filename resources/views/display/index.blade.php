@@ -23,31 +23,104 @@
                         
                         {{ Form::close() }}
                     </div>
-                    <div class="table-responsive">
-                        <table class="table table-condensed">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Name</th>
-                                    <th>Thumbnail</th>
-                                    <th>Price</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($productInfo as $key => $info) 
-                                    <tr>
-                                        <th>{{ $info->id }}</th>
-                                        <th>{{ $info->product_name }}</th>
-                                        <th><img src="{{ asset('storage/image/' . $info->product_image) }}" alt="image" width=100 height=100 /></th>
-                                        <th>{{ $info->price }}円</th>
-                                        <th>
-                                            <a href="{{ url('/display/detail/'.$info->id) }}">詳細を表示</a>
-                                        </th>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                    
+                    <div id="content_wrapper">
+                        @foreach ($productInfo->chunk(4) as $key => $info)
+                        <ul id="item_content">
+                            <li>
+                                <div class="product_data">
+                                    <div class="image_file">
+                                        <a href="{{ url('/display/detail/'.$productInfo[$key]->id) }}">
+                                            <p>
+                                                <img src="{{ asset('storage/image/' . $productInfo[$key]->product_image) }}" alt="image" />
+                                            </p>
+                                        </a>
+                                    </div>
+                                    <div class="product_name">
+                                        <a href="{{ url('/display/detail/'.$productInfo[$key]->id) }}">
+                                            {{ $productInfo[$key]->product_name }}
+                                        </a>
+                                    </div>
+                                    <div class="product_price">
+                                        <a href="{{ url('/display/detail/'.$productInfo[$key]->id) }}">
+                                            <span class="a-size-base a-color-price s-price a-text-bold">
+                                                ￥ {{ $productInfo[$key]->price }}
+                                            </span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="product_data">
+                                    <div class="image_file">
+                                        <a href="{{ url('/display/detail/'.$productInfo[$key + 1]->id) }}">
+                                            <p>
+                                                <img src="{{ asset('storage/image/' . $productInfo[$key + 1]->product_image) }}" alt="image" />
+                                            </p>
+                                        </a>
+                                    </div>
+                                    <div class="product_name">
+                                        <a href="{{ url('/display/detail/'.$productInfo[$key + 1]->id) }}">
+                                            {{ $productInfo[$key + 1]->product_name }}
+                                        </a>
+                                    </div>
+                                    <div class="product_price">
+                                        <a href="{{ url('/display/detail/'.$productInfo[$key + 1]->id) }}">
+                                            <span class="a-size-base a-color-price s-price a-text-bold">
+                                                ￥ {{ $productInfo[$key + 1]->price }}
+                                            </span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="product_data">
+                                    <div class="image_file">
+                                        <a href="{{ url('/display/detail/'.$productInfo[$key + 2]->id) }}">
+                                            <p>
+                                                <img src="{{ asset('storage/image/' . $productInfo[$key + 2]->product_image) }}" alt="image" />
+                                            </p>
+                                        </a>
+                                    </div>
+                                    <div class="product_name">
+                                        <a href="{{ url('/display/detail/'.$productInfo[$key + 2]->id) }}">
+                                            {{ $productInfo[$key + 2]->product_name }}
+                                        </a>
+                                    </div>
+                                    <div class="product_price">
+                                        <a href="{{ url('/display/detail/'.$productInfo[$key + 2]->id) }}">
+                                            <span class="a-size-base a-color-price s-price a-text-bold">
+                                                ￥ {{ $productInfo[$key + 2]->price }}
+                                            </span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="product_data">
+                                    <div class="image_file">
+                                        <a href="{{ url('/display/detail/'.$productInfo[$key + 3]->id) }}">
+                                            <p>
+                                                <img src="{{ asset('storage/image/' . $productInfo[$key + 3]->product_image) }}" alt="image" />
+                                            </p>
+                                        </a>
+                                    </div>
+                                    <div class="product_name">
+                                        <a href="{{ url('/display/detail/'.$productInfo[$key + 3]->id) }}">
+                                            {{ $productInfo[$key + 3]->product_name }}
+                                        </a>
+                                    </div>
+                                    <div class="product_price">
+                                        <a href="{{ url('/display/detail/'.$productInfo[$key + 3]->id) }}">
+                                            <span class="a-size-base a-color-price s-price a-text-bold">
+                                                ￥ {{ $productInfo[$key + 3]->price }}
+                                            </span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                        @endforeach
                     </div>
                     
                     <div class="form-group">

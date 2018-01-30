@@ -151,7 +151,7 @@ class DisplayController extends Controller
             
         }
 
-        $productInfo = $this->getProductPaginate();
+        $productInfo = $this->getProductPaginate(40);
         $categoryList = $this->getCategoryData();
         return view('display.index', compact('productInfo', 'categoryList'));
     }
@@ -531,21 +531,21 @@ class DisplayController extends Controller
         $categoryId = $request->category_id;
         $searchText = $request->search_text;
         
-        $productInfo = $this->getProductPaginate();
+        $productInfo = $this->getProductPaginate(40);
         $categoryList = $this->getCategoryData();
         $paginate_flg = false;
         if (!empty($categoryId) && !empty($searchText)) {
             $productInfo = \App\Product::where('category_id', $categoryId)
                                         ->orWhere('product_name', 'LIKE', "%$searchText%")
-                                        ->paginate(10);
+                                        ->paginate(40);
             $paginate_flg = true;
         } else if (!empty($categoryId) && empty($searchText)) {
             $productInfo = \App\Product::where('category_id', $categoryId)
-                                        ->paginate(10);
+                                        ->paginate(40);
             $paginate_flg = true;
         } else if (empty($categoryId) && !empty($searchText)) {
             $productInfo = \App\Product::where('product_name', 'LIKE', "%$searchText%")
-                                        ->paginate(10);
+                                        ->paginate(40);
             $paginate_flg = true;
         }
         

@@ -106,13 +106,26 @@ class HomeController extends Controller
                 
                 DB::table('products')->orderBy('id')->chunk(100, function ($products) use ($stream) {
                     foreach ($products as $product) {
+                        $product_image = '';
+                        if (count(\App\Product::find($product->id)->productImages()->get()) > 1) {
+                            $counter = 1;
+                            foreach (\App\Product::find($product->id)->productImages()->get() as $imageData) {
+                                $product_image = $product_image . $imageData->product_image;
+                                if ($counter < count(\App\Product::find(1)->productImages()->get())) {
+                                    $product_image = $product_image . ",";
+                                }
+                                $counter++;
+                            } 
+                        } else {
+                            $product_image = \App\Product::find($product->id)->productImages()->first()->product_image;
+                        }
                         fputcsv($stream, [
                             $product->id,
                             $product->category_id, 
                             $product->product_name,
                             $product->price, 
                             $product->stock,
-                            \App\Product::find($product->id)->productImages()->first()->product_image,
+                            $product_image,
                         ]);
                     }
                 });
@@ -186,7 +199,7 @@ class HomeController extends Controller
                 }
                 $lineCount++;
             } 
-            
+
             // 取得したCSV情報をバラし、DBに格納
             foreach ($csvData as $line) {
                 $lastInsertId = DB::table('products')->insertGetId([
@@ -200,13 +213,27 @@ class HomeController extends Controller
                 ]);
                 
                 if($lastInsertId) {
-                    DB::table('product_images')->insert([
-                        'product_id' => $lastInsertId, 
-                        'product_image' =>  $line[5],
-                        'image_dir' => 'public/image',
-                        'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
-                        'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
-                    ]);
+                    if (preg_match('/,/', $line[5])) {
+                        $imageNameArr = explode(',', $line[5]);
+                        
+                        foreach ($imageNameArr as $imageName) {
+                            DB::table('product_images')->insert([
+                                'product_id' => $lastInsertId, 
+                                'product_image' => $imageName,
+                                'image_dir' => 'public/image',
+                                'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+                                'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+                            ]);
+                        }
+                    } else {
+                        DB::table('product_images')->insert([
+                            'product_id' => $lastInsertId, 
+                            'product_image' => $line[5],
+                            'image_dir' => 'public/image',
+                            'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+                            'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+                        ]);
+                    }
                 }
             }
             return redirect('import')->with('status', 'CSV Import Success!'); 

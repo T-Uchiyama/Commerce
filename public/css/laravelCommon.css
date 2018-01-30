@@ -132,3 +132,19 @@ a.disabled {
 .a-color-price {
     color: #B12704!important;
 }
+
+#user {
+    background-color: #36618a;
+}
+
+#admin {
+    background-color: #368a6e;
+}
+
+.navbar-default .navbar-brand {
+    color: #FFF;
+}
+
+.navbar-default .navbar-nav>li>a, .navbar-default .navbar-text {
+    color: #FFF;
+}

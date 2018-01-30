@@ -27,7 +27,11 @@
 </head>
 <body>
     <div id="app">
-        <nav class="navbar navbar-default navbar-static-top">
+        @if (Request::root() == 'http://admin.commerce.com')
+            <nav id="admin" class="navbar navbar-default navbar-static-top">
+        @else
+            <nav id="user" class="navbar navbar-default navbar-static-top">
+        @endif
             <div class="container">
                 <div class="navbar-header">
                     <!-- Collapsed Hamburger -->
@@ -108,6 +112,14 @@
                                 </li>
                             @endguest
                         @endif
+                        <li><a href="{{ route('regist_member') }}">会員登録</a></li>
+                        <li><a href="{{ route('product') }}">商品登録</a></li>
+                        <li>
+                            <a href="{{ route('cart') }}">
+                                <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+                                ショッピングカート
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </div>

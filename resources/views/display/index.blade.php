@@ -123,20 +123,6 @@
                         @endforeach
                     </div>
                     
-                    <div class="form-group">
-                        <a href="{{ route('regist_member') }}">
-                            会員登録
-                            <i class="fa fa-chevron-right" aria-hidden="true"></i>
-                        </a>
-                        <a href="{{ route('product') }}">
-                            商品登録
-                            <i class="fa fa-chevron-right" aria-hidden="true"></i>
-                        </a>
-                        <a href="{{ route('cart') }}">
-                            ショッピングカート
-                            <i class="fa fa-chevron-right" aria-hidden="true"></i>
-                        </a>
-                    </div>
                     @if($productInfo)
                         <div class="pagination-bar text-center">
                                {{ $productInfo->appends(Request::only('category_id', 'search_text'))->links() }}

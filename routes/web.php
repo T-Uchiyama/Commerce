@@ -23,6 +23,8 @@ Route::get('/product_info', 'HomeController@productInfo')->name('product_info');
 Route::get('/product_info/edit/{id}', 'HomeController@showProductEditForm')->name('master.edit');
 Route::post('/product_info/edit/{id}', 'HomeController@ProductMasterEdit');
 Route::post('/csv', 'HomeController@downloadCSV')->name('csv');
+Route::get('/import', 'HomeController@showInportForm')->name('import');
+Route::post('/import', 'HomeController@import');
 
 Route::get('/product', 'ProductController@index')->name('product');
 Route::post('/product/upload', 'ProductController@upload');

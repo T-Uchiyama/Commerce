@@ -6,6 +6,8 @@ use DB;
 use App\Product;  
 use App\Traits\DataAcquisition;
 use Illuminate\Http\Request;
+use \SplFileObject;
+use Carbon\Carbon;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class HomeController extends Controller
@@ -96,9 +98,12 @@ class HomeController extends Controller
      */
     public function downloadCSV()
     {
-        return  new StreamedResponse(
+        return new StreamedResponse(
             function () {
                 $stream = fopen('php://output', 'w');
+                // カラム名を内容の記載前にヘッダーとして追加
+                fputcsv($stream, ["id", "category_id", "product_name", "price", "stock", "product_image"]);
+                
                 DB::table('products')->orderBy('id')->chunk(100, function ($products) use ($stream) {
                     foreach ($products as $product) {
                         fputcsv($stream, [
@@ -106,7 +111,8 @@ class HomeController extends Controller
                             $product->category_id, 
                             $product->product_name,
                             $product->price, 
-                            $product->stock
+                            $product->stock,
+                            \App\Product::find($product->id)->productImages()->first()->product_image,
                         ]);
                     }
                 });
@@ -118,5 +124,97 @@ class HomeController extends Controller
                 'Content-Disposition' => 'attachment; filename="productAll.csv"',
             ]
         );
+    }
+    
+    /**
+     * CSVインポート画面の表示
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function showInportForm()
+    {
+        return view('admin.import');
+    }
+    
+    /**
+     * アップロードされたCSVを読み込み商品DBへインポート
+     * 
+     * @param  Request $request CSVファイル
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function import(Request $request)
+    {
+        $this->validate($request, [
+            'file' => [
+                'required',
+                'file'
+            ]
+        ]);
+        
+        if ($request->file('file')->isValid([])) {
+            $filename = $request->file->storeAs('public/csv', $request->file->getClientOriginalName());
+            $filePath = 'storage/csv/'.basename($filename);
+            $file = new SplFileObject($filePath); 
+            $file->setFlags(SplFileObject::READ_CSV); 
+            $csvData = array();
+            
+            $lineCount = 1;
+            // CSVデータを取得
+            foreach ($file as $key => $line) {
+                $tmp_array = array();
+                $set_flg = false;
+                
+                //最初の行にはカラム名が記載されているため行を飛ばす。
+                if ($lineCount > 1) {
+                    foreach($line as $str) {
+                        // エンコードをすべてUTF-8に変換
+                        mb_language("Japanese");
+                        $str = mb_convert_encoding($str, "UTF-8", "auto");
+                        $tmp_array[] = htmlspecialchars($str);
+                    }
+                    // 空行かどうかチェック
+                    foreach($tmp_array as $tmp) {
+                        if(!empty($tmp)) {
+                            $set_flg = true;
+                        }
+                    }
+                    // 空行でなければ登録する
+                    if($set_flg){
+                         $csvData[] = $tmp_array;
+                    }   
+                }
+                $lineCount++;
+            } 
+            
+            // 取得したCSV情報をバラし、DBに格納
+            foreach ($csvData as $line) {
+                $lastInsertId = DB::table('products')->insertGetId([
+                    'category_id' => $line[1],
+                    'product_name' => $line[2],
+                    'price' => $line[3],
+                    'stock' => $line[4],
+                    'view_flg' => 1,
+                    'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+                    'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+                ]);
+                
+                if($lastInsertId) {
+                    DB::table('product_images')->insert([
+                        'product_id' => $lastInsertId, 
+                        'product_image' =>  $line[5],
+                        'image_dir' => 'public/image',
+                        'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+                        'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+                    ]);
+                }
+            }
+            return redirect('import')->with('status', 'CSV Import Success!'); 
+        } else {
+            return redirect()
+                   ->back()
+                   ->withInput()
+                   ->withErrors(['file' => '画像がアップロードされていないか不正なデータです。']);
+        }
     }
 }

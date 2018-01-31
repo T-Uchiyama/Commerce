@@ -260,7 +260,7 @@ class DisplayController extends Controller
             if ($value['product_id'] == $id) {
                 unset($sessionData[$key]);
                 // ショッピングカート一覧の増減ボタンで購入個数を変更している場合は合わせて削除
-                if (array_key_exists($value['name'], $changeNumData)) {
+                if (!empty($changeNumData) && array_key_exists($value['name'], $changeNumData)) {
                     unset($changeNumData[$value['name']]);
                     
                     $request->session()->forget('changeCart');

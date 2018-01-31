@@ -88,4 +88,45 @@ trait DataAcquisition
         
         return $productMasterData;
     }
+    
+    /**
+     * 検索文字を取得しクエリを用い検索結果の表示
+     * @param  $category_id カテゴリID
+     * @param  $search_Text 検索文字列
+     * @param  $controller メソッド呼び出し元のコントローラー名 
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function getQuerySearch($category_id = 0, $search_Text = null, $controller = null)
+    {    
+        if ($controller == 'Product') {
+            $option = 20;
+        } else {
+            $option = 40;
+        }
+        $paginate_flg = false;
+        if (!empty($category_id) && !empty($search_Text)) {
+            $productInfo = \App\Product::where('category_id', $category_id)
+                                        ->orWhere('product_name', 'LIKE', "%$search_Text%")
+                                        ->paginate($option);
+            $paginate_flg = true;
+        } else if (!empty($category_id) && empty($search_Text)) {
+            $productInfo = \App\Product::where('category_id', $category_id)
+                                        ->paginate($option);
+            $paginate_flg = true;
+        } else if (empty($category_id) && !empty($search_Text)) {
+            $productInfo = \App\Product::where('product_name', 'LIKE', "%$search_Text%")
+                                        ->paginate($option);
+            $paginate_flg = true;
+        }
+        
+        if ($paginate_flg) {
+            foreach ($productInfo as $key => $value) {
+                $productInfo[$key]->product_image = \App\Product::find($value->id)->productImages()->first()->product_image; 
+            }
+        } else {
+            $productInfo = $this->getProductPaginate($option);
+        }
+        return $productInfo;
+    }
 }

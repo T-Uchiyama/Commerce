@@ -19,10 +19,9 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = $this->getProductList();
         $categoryList = $this->getCategoryData();
 
-        return view('products.upload', compact('products', 'categoryList'));
+        return view('products.upload', compact('categoryList'));
     }
     
     /**
@@ -121,5 +120,22 @@ class ProductController extends Controller
                    ->withInput()
                    ->withErrors(['edit' => '保存に失敗しました。']);
         }
+    }
+    
+    /**
+     * 検索文字を取得しクエリを用い検索結果の表示
+     * @param  Request $request リクエストデータ
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function getProductSearch(Request $request)
+    {
+        $categoryId = $request->category_id;
+        $searchText = $request->search_text;
+        
+        $products = $this->getQuerySearch($categoryId, $searchText, 'Product');
+        $categoryList = $this->getCategoryData();
+
+        return view('products.upload', compact('products', 'categoryList'));
     }
 }

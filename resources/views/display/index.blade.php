@@ -14,7 +14,7 @@
                 <div class="panel-body">
                     {{ Form::label('search', 'Search Form') }}
                     <div id="search-area">
-                        {{ Form::open(['method' => 'GET', 'url' => route('search')] ) }}
+                        {{ Form::open(['method' => 'GET', 'url' => route('display.search')] ) }}
                         {{ Form::select('category_id', $categoryList, null, ['id' => 'category_id', 'placeholder' => 'すべてのカテゴリ']) }}
                         {{ Form::text('search_text', null, ['id' => 'search_text']) }}
                         <button type="submit" class="btn btn-success" id="search_Button">

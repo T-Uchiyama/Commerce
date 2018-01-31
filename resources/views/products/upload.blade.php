@@ -60,18 +60,55 @@
                     {!! Form::close() !!}
                     
                     <div class="form-group" align="center">
-                        {!! Form::label('infomation', '既に登録されている在庫を更新する場合には下記のサムネイルをクリック') !!}
+                        {!! Form::label('infomation', '既に登録されている在庫を更新したい場合には下記の検索フォームで検索') !!}
                     </div>
 
                     <div class="form-group">
-                        @if ($products)
-                            @foreach ($products as $product)
-                                <div class="imageArea" style="float:left">
-                                    <a href="{{ route('edit', $product->id) }}">
-                                        <img src="{{ asset('storage/image/' . $product->product_image) }}" alt="image" width=100 height=100 value="{{ $product->product_image }}" />
+                        <div id="search-area">
+                            {{ Form::open(['method' => 'GET', 'url' => route('product.search')] ) }}
+                            {{ Form::select('category_id', $categoryList, null, ['id' => 'category_id', 'placeholder' => 'すべてのカテゴリ']) }}
+                            {{ Form::text('search_text', null, ['id' => 'search_text']) }}
+                            <button type="submit" class="btn btn-success" id="search_Button">
+                                <i class="fa fa-search" aria-hidden="true"></i>
+                            </button>
+                            
+                            {{ Form::close() }}
+                        </div>
+                        
+                        @if (!empty($products))
+                        <div id="content_wrapper">
+                            <div class="form-group" align="center">
+                                {!! Form::label('infomation', '下記のサムネイルをクリックすると変更画面に遷移します') !!}
+                            </div>
+                            @foreach ($products->chunk(4) as $key => $product)
+                            <ul id="item_content">
+                                <li>
+                                    <a href="{{ route('edit', $products[$key]->id) }}">
+                                        <img src="{{ asset('storage/image/' . $products[$key]->product_image) }}" alt="image" value="{{ $products[$key]->product_image }}" />
                                     </a>
-                                </div>
+                                </li>
+                                <li>
+                                    <a href="{{ route('edit', $products[$key + 1]->id) }}">
+                                        <img src="{{ asset('storage/image/' . $products[$key + 1]->product_image) }}" alt="image" value="{{ $products[$key + 1]->product_image }}" />
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('edit', $products[$key + 2]->id) }}">
+                                        <img src="{{ asset('storage/image/' . $products[$key + 2]->product_image) }}" alt="image" value="{{ $products[$key + 2]->product_image }}" />
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('edit', $products[$key + 3]->id) }}">
+                                        <img src="{{ asset('storage/image/' . $products[$key + 3]->product_image) }}" alt="image" value="{{ $products[$key + 3]->product_image }}" />
+                                    </a>
+                                </li>
+                            </ul>
                             @endforeach
+                        </div>
+                            
+                        <div class="pagination-bar text-center">
+                            {{ $products->appends(Request::only('category_id', 'search_text'))->links() }}
+                        </div>
                         @endif
                     </div>
                 </div>

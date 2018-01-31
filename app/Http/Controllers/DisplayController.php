@@ -526,34 +526,13 @@ class DisplayController extends Controller
      * 
      * @return \Illuminate\Http\Response
      */
-    public function getQuerySearch(Request $request)
+    public function getDisplaySearch(Request $request)
     {
         $categoryId = $request->category_id;
         $searchText = $request->search_text;
         
-        $productInfo = $this->getProductPaginate(40);
+        $productInfo = $this->getQuerySearch($categoryId, $searchText);
         $categoryList = $this->getCategoryData();
-        $paginate_flg = false;
-        if (!empty($categoryId) && !empty($searchText)) {
-            $productInfo = \App\Product::where('category_id', $categoryId)
-                                        ->orWhere('product_name', 'LIKE', "%$searchText%")
-                                        ->paginate(40);
-            $paginate_flg = true;
-        } else if (!empty($categoryId) && empty($searchText)) {
-            $productInfo = \App\Product::where('category_id', $categoryId)
-                                        ->paginate(40);
-            $paginate_flg = true;
-        } else if (empty($categoryId) && !empty($searchText)) {
-            $productInfo = \App\Product::where('product_name', 'LIKE', "%$searchText%")
-                                        ->paginate(40);
-            $paginate_flg = true;
-        }
-        
-        if($paginate_flg) {
-            foreach ($productInfo as $key => $value) {
-                $productInfo[$key]->product_image = \App\Product::find($value->id)->productImages()->first()->product_image; 
-            }
-        }
 
         return view('display.index', compact('productInfo', 'categoryList'));
     }

@@ -30,6 +30,7 @@ Route::get('/product', 'ProductController@index')->name('product');
 Route::post('/product/upload', 'ProductController@upload');
 Route::get('/product/edit/{id}', 'ProductController@getEdit')->name('edit');
 Route::post('/product/edit/{id}', 'ProductController@edit');
+Route::get('/product/search', 'ProductController@getProductSearch')->name('product.search');
 
 Route::get('/display', 'DisplayController@index')->name('display');
 Route::get('/display/detail/{id}', 'DisplayController@getDetail');
@@ -40,7 +41,7 @@ Route::get('/display/cart', 'DisplayController@getCart')->name('cart');
 Route::get('/display/checkout', 'DisplayController@getCheckout')->name('checkout');
 Route::post('/display/checkout', 'DisplayController@purchase');
 Route::post('/display/changeCartNum', 'DisplayController@changeCartNum');
-Route::get('/display/search', 'DisplayController@getQuerySearch')->name('search');
+Route::get('/display/search', 'DisplayController@getDisplaySearch')->name('display.search');
 
 Route::get('/regist_member', 'DisplayController@getRegistMember')->name('regist_member');
 

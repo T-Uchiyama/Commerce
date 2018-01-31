@@ -66,6 +66,9 @@ a.disabled {
 
 #search-area {
     position: relative;
+    max-width: 700px;
+    margin:0 auto; 
+	text-align:center;
     z-index: 0;
 }
 
@@ -147,4 +150,8 @@ a.disabled {
 
 .navbar-default .navbar-nav>li>a, .navbar-default .navbar-text {
     color: #FFF;
+}
+
+.imageArea img {
+    margin: 5px;
 }

@@ -1,4 +1,4 @@
-<div id="login-form">
+<div id="enclosure">
     <form class="form-horizontal" method="POST" action="{{ route('login') }}">
         {{ csrf_field() }}
 

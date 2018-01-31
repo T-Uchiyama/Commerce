@@ -29,7 +29,7 @@
                             </ul>  
                         </div>
                     @endif
-                    <div class="form-group" style="border-style:dotted; border-widtd:2px;padding: 10px 5px 10px 20px; border-color: rgb(184, 236, 247)">
+                    <div id="enclosure">
                         <center>
                             {!! Form::label('address_info', 'お届け先住所') !!}
                         </center>
@@ -42,26 +42,31 @@
                         <div class="form-group">
                             {!! Form::label('postal_code', '郵便番号:') !!} 
                             {!! Form::text('postal_code', null, ['onkeyup'=>"AjaxZip3.zip2addr(this,'','prefecture','address1','address2','address3')"]); !!}
+                            <h6><font color="#3097d1">※郵便番号を入力後に自動で住所を取得します</font></h6>
                         </div>
                         
                         <div class="form-group">
                             {!! Form::label('prefecture', '都道府県:') !!} 
                             {!! Form::text('prefecture') !!}
+                            <h6>例:東京都</h6>
                         </div>
                         
                         <div class="form-group">
                             {!! Form::label('address1', '住所(市区町村郡):') !!} 
                             {!! Form::text('address1') !!}
+                            <h6>例:○○区</h6>
                         </div>
                         
                         <div class="form-group">
                             {!! Form::label('address2', '住所(町名番地):') !!} 
                             {!! Form::text('address2') !!}
+                            <h6>例:○○町</h6>
                         </div>
                         
                         <div class="form-group">
                             {!! Form::label('address3', '住所(建物名):') !!} 
                             {!! Form::text('address3') !!}
+                            <h6>例:○-○-○ ○○タワー808</h6>
                         </div>
                     </div>
 

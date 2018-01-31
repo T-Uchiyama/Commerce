@@ -371,14 +371,14 @@ class DisplayController extends Controller
          }
 
 
-        // プレーンテキストタイプでは改行が表示されないのはLaravelの仕様とのこと。
         $data = array(
             'Content' => \Auth::user()->name . '様' . PHP_EOL .
                          '-------------------------------------------------------------------------' . PHP_EOL .
                          '今回お買い上げの商品は' . PHP_EOL . $item .
                          '合計金額は' . $total . '円です。' . PHP_EOL .
                          '-------------------------------------------------------------------------' . PHP_EOL .
-                         'お届け先 :' . "\t" . $request->destination_name . PHP_EOL .
+                         'お届け先 :' . PHP_EOL .
+                          "\t" . $request->destination_name . '様' . PHP_EOL .
                           "\t" . $request->postal_code . PHP_EOL .
                           "\t" . $request->prefecture . $request->address1 . $request->address2 . $request->address3 . PHP_EOL .
                          '支払い方法: ' . $paymentTypeArr[$request->payment_type] . PHP_EOL .

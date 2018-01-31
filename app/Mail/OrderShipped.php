@@ -33,7 +33,6 @@ class OrderShipped extends Mailable
     public function build()
     {
         $data = $this->request->session()->get('mail_content');
-        return $this->view('/emails/purchase' , compact('data'))
-                    ->subject('お買い上げありがとうございます');
+        return $this->text('emails.purchase' , compact('data'))->subject('お買い上げありがとうございます');
     }
 }

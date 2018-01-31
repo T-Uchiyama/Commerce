@@ -22,19 +22,22 @@
                 <div class="panel-heading">Register Member</div>
                 
                 <div class="panel-body">
+                    @include('register.login')
+                    
+                    <div class="form-group" align="center">
+                        <label>下記サービスアカウントでのログインはこちら</label>
+                    </div>
+                    
                     <div class="form-group">
                         <div class="col-md-8 col-md-offset-4">
-                            <!-- Facebookでログイン -->
-                            <div id="status"></div>
-                            <div class="fb-login-button" 
-                                 scope="public_profile,email"
-                                 data-max-rows="1" 
-                                 data-size="large" 
-                                 data-button-type="continue_with" 
-                                 data-show-faces="false" 
-                                 data-auto-logout-link="true" 
-                                 data-use-continue-as="false"
-                                 onlogin="useFacebookLogin()"></div>
+                            <a href="{{ url('/confirm_facebook') }}">
+                                <button class="facebook">
+                                    <i class="fa fa-facebook-official" aria-hidden="true">
+                                    </i>
+                                    Facebookでログイン
+                                </button>
+                            </a>
+                        </div>
                     </div>
                         
                     <!-- Twitterでログイン -->

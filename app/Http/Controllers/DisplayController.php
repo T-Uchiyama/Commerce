@@ -176,6 +176,10 @@ class DisplayController extends Controller
      */
     public function getRegistMember()
     {
+        if (Auth::check()) {
+            return redirect()->action('DisplayController@index')
+                             ->with('status', '既にログインされています');
+        }
         return view('register.index');
     }
     

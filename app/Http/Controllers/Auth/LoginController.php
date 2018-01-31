@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Abraham\TwitterOAuth\TwitterOAuth;
 use Session;
+use Illuminate\Http\Request;
 
 class LoginController extends Controller
 {
@@ -43,7 +44,7 @@ class LoginController extends Controller
     {        
         $authURL = 'http://www.facebook.com/dialog/oauth?client_id=' .  \Config::get('const.FACEBOOK_ID') . 
                    '&redirect_uri=' . urlencode(\Config::get('const.OAUTH_CALLBACK'));
-        return json_encode($authURL);
+        return redirect($authURL);
     }
     
     public function confirm_twitter()
@@ -62,7 +63,7 @@ class LoginController extends Controller
             $url = $connection->url('oauth/authenticate', array('oauth_token' => $requestToken['oauth_token']));
 
             //Twitter.com の認証画面へリダイレクト
-            header( 'location: '. $url );
+            return redirect($url);
         }
     }
     
@@ -78,5 +79,20 @@ class LoginController extends Controller
         $authUrl = $connection->getAuthorizationUrl();
         Session::put('oauth2state',$connection->getState());
         return redirect($authUrl);
+    }
+    
+    /**
+     * Log the user out of the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function logout(Request $request)
+    {
+        $this->guard()->logout();
+
+        $request->session()->invalidate();
+
+        return redirect('display')->with('status', 'ログアウトしました');
     }
 }

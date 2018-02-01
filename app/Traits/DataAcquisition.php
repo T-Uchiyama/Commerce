@@ -55,12 +55,17 @@ trait DataAcquisition
     
     /**
      * カテゴリ情報の取得
+     * @param $id カテゴリID
      * 
      * @return DB::table('categories') カテゴリ情報
      */
-    public function getCategoryData()
-    {    
-        return DB::table('categories')->pluck('name', 'id');
+    public function getCategoryData($id = 0)
+    {
+        if ($id == 0) {
+            return DB::table('categories')->pluck('name', 'id');
+        } else {
+            return DB::table('categories')->where('id', $id)->first();
+        } 
     }
     
     /**

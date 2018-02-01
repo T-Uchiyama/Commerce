@@ -4,6 +4,21 @@
 <div class="container">
     <div class="row">
         <div class="col-md-8 col-md-offset-2">
+            @if (session('status'))
+                <div class="alert alert-success">
+                    {{ session('status') }}
+                </div>
+            @endif
+            
+            @if ($errors->any())
+                <div class="alert alert-danger">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>  
+                </div>
+            @endif
             <div class="panel panel-default">
                 <div class="panel-heading">カテゴリ一覧</div>
 
@@ -17,6 +32,7 @@
                                     <th>Name</th>
                                     <th>Created_At</th>
                                     <th>Updated_At</th>
+                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -26,6 +42,13 @@
                                         <th>{{ $masterData->name }}</th>
                                         <th>{{ $masterData->created_at  }}</th>
                                         <th>{{ $masterData->updated_at }}</th>
+                                        <th>
+                                            {!! Form::open(['url' => route('master.category.edit', $masterData->id), 'method' => 'get']) !!}
+                                                    <button type="submit" class="btn btn-info">
+                                                        データ編集
+                                                    </button>
+                                            {!! Form::close() !!}
+                                        </th>
                                     </tr>
                                 @endforeach
                             </tbody>

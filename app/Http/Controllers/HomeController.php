@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use DB;
 use App\Product;  
+use App\Category;  
 use App\Traits\DataAcquisition;
 use Illuminate\Http\Request;
 use \SplFileObject;
@@ -67,6 +68,20 @@ class HomeController extends Controller
     }
     
     /**
+     * 管理者画面側の商品編集画面の表示
+     * 
+     * @param  integer $id 商品ID
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function showCategoryEditForm($id = 0)
+    {
+        $category = $this->getCategoryData($id);
+
+        return view('admin.categoryEdit', compact('category'));
+    }
+    
+    /**
      * 管理者画面側での商品情報修正
      * 
      * @param Request $request リクエストデータ
@@ -74,7 +89,7 @@ class HomeController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function ProductMasterEdit(Request $request, $id = 0)
+    public function productMasterEdit(Request $request, $id = 0)
     {
         $this->validate($request, [
             'productName' => 'required',
@@ -89,6 +104,33 @@ class HomeController extends Controller
         
         if($product->save()) {
             return redirect('product_info')->with('status', '編集しました。'); 
+        } else {
+            return redirect()
+                   ->back()
+                   ->withInput()
+                   ->withErrors(['edit' => '保存に失敗しました。']);
+        }
+    }
+    
+    /**
+     * 管理者画面側でのカテゴリ情報修正
+     * 
+     * @param Request $request リクエストデータ
+     * @param integer $id      商品ID
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function categoryMasterEdit(Request $request, $id = 0)
+    {
+        $this->validate($request, [
+            'categoryName' => 'required',
+        ]);
+        
+        $category = \App\Category::find($id);
+        $category->name = $request->categoryName;
+        
+        if($category->save()) {
+            return redirect('category_info')->with('status', '編集しました。'); 
         } else {
             return redirect()
                    ->back()

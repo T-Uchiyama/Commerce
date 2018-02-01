@@ -20,12 +20,14 @@ Auth::routes();
 Route::get('/home', 'HomeController@index')->name('home');
 Route::get('/user_info', 'HomeController@userInfo')->name('user_info');
 Route::get('/product_info', 'HomeController@productInfo')->name('product_info');
-Route::get('/product_info/edit/{id}', 'HomeController@showProductEditForm')->name('master.edit');
-Route::post('/product_info/edit/{id}', 'HomeController@ProductMasterEdit');
+Route::get('/product_info/edit/{id}', 'HomeController@showProductEditForm')->name('master.product.edit');
+Route::post('/product_info/edit/{id}', 'HomeController@productMasterEdit');
 Route::post('/csv', 'HomeController@downloadCSV')->name('csv');
 Route::get('/import', 'HomeController@showInportForm')->name('import');
 Route::post('/import', 'HomeController@import');
 Route::get('/category_info', 'HomeController@categoryInfo')->name('category_info');
+Route::get('/category_info/edit/{id}', 'HomeController@showCategoryEditForm')->name('master.category.edit');
+Route::post('/category_info/edit/{id}', 'HomeController@categoryMasterEdit')->name('master.category.edit');
 
 Route::get('/product', 'ProductController@index')->name('product');
 Route::post('/product/upload', 'ProductController@upload');

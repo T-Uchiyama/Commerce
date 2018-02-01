@@ -27,6 +27,11 @@
                         </a>
                     </div>
                     <div class="from-group">
+                        <a href="{{ route('category_info') }}">
+                            カテゴリ一覧を表示
+                        </a>
+                    </div>
+                    <div class="from-group">
                         <a href="{{ route('display') }}">
                             商品購入ページへ遷移
                         </a>

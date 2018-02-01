@@ -46,6 +46,12 @@ class HomeController extends Controller
         return view('admin.product', compact('productMasterData'));
     }
     
+    public function categoryInfo()
+    {
+        $categoryMasterData = $this->getCategoryMasterData();
+        return view('admin.category', compact('categoryMasterData'));
+    }
+    
     /**
      * 管理者画面側の商品編集画面の表示
      * 

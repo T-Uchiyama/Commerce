@@ -74,6 +74,16 @@ trait DataAcquisition
     }
     
     /**
+     * カテゴリ情報を全件取得
+     * 
+     * @return DB::table('categories')
+     */
+    public function getCategoryMasterData()
+    {
+        return DB::table('categories')->get();
+    }
+    
+    /**
      * 商品情報を全件取得
      * 
      * @return DB::table('products')

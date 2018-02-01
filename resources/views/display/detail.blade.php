@@ -46,14 +46,17 @@
 
                                             </div>
                                         </th>
-                                        <th>{{ $product->product_name }}</th>
-                                        <th>{{ $product->price }}円</th>
-                                        <th>残り{{ $product->stock }}点</th>
+                                        <th><span id="product_detail_name">{{ $product->product_name }}</span></th>
+                                        <th><span id="product_detail_price">{{ $product->price }}円</span></th>
+                                        <th><span id="product_detail_stock">残り{{ $product->stock }}点</span></th>
                                     </tr>
                             </tbody>
                         </table>
                     </div>
-                    
+
+                    <script type="text/javascript">
+                        setStorage();
+                    </script>
                     <div class="form-group">
                         <form action="{{ url('/display/shoppingcart/'.$product->id)}}" method="POST" class="form-horizontal">
                             {{ csrf_field() }}

@@ -128,6 +128,11 @@
                                {{ $productInfo->appends(Request::only('category_id', 'search_text'))->links() }}
                         </div>
                     @endif
+                    
+                    <div id="recent"></div>
+                    <script type="text/javascript">
+                        getStorage();
+                    </script>
                 </div>
             </div>
         </div>

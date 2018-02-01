@@ -22,6 +22,7 @@
     <script src="{{ asset('js/app.js') }}"></script>
     <script src="{{ asset('js/facebook.js') }}"></script>
     <script src="{{ asset('js/laravelCommon.js') }}"></script>
+    <script src="{{ asset('js/recent.js') }}"></script>
     <script src="https://ajaxzip3.github.io/ajaxzip3.js" charset="UTF-8"></script>
 </body>
 </head>

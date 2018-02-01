@@ -208,3 +208,7 @@ a.disabled {
     padding: 10px;
     margin-bottom: 10px;
 }
+
+#recent {
+    max-width: 945px;
+}

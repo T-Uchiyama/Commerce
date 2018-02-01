@@ -66,9 +66,19 @@ class HomeController extends Controller
 
         return view('admin.productEdit', compact('product'));
     }
+
+    /**
+     * 管理者画面側のカテゴリ新規追加画面の表示
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function showCategoryCreateForm()
+    {
+        return view('admin.categoryCreate');
+    }
     
     /**
-     * 管理者画面側の商品編集画面の表示
+     * 管理者画面側のカテゴリ編集画面の表示
      * 
      * @param  integer $id 商品ID
      * 
@@ -109,6 +119,32 @@ class HomeController extends Controller
                    ->back()
                    ->withInput()
                    ->withErrors(['edit' => '保存に失敗しました。']);
+        }
+    }
+
+    /**
+     * 管理者画面側でのカテゴリ情報新規作成
+     * 
+     * @param Request $request リクエストデータ
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function categoryMasterCreate(Request $request)
+    {
+        $this->validate($request, [
+            'categoryName' => 'required',
+        ]);
+        
+        $category = new Category();
+        $category->name = $request->categoryName;
+        
+        if($category->save()) {
+            return redirect('category_info')->with('status', '追加しました。'); 
+        } else {
+            return redirect()
+                   ->back()
+                   ->withInput()
+                   ->withErrors(['create' => '新規作成に失敗しました。']);
         }
     }
     

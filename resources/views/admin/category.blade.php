@@ -55,7 +55,15 @@
                         </table>
                     </div>
                     
-                    <div class="from-group">
+                    <div class="form-group">
+                        {!! Form::open(['url' => route('master.category.create'), 'method' => 'get']) !!}
+                            <button type="submit" class="btn btn-primary">
+                                新規作成
+                            </button>
+                        {!! Form::close() !!}
+                    </div>
+                    
+                    <div class="form-group">
                         <a href="{{ route('home') }}">
                             管理者トップページに戻る
                         </a>

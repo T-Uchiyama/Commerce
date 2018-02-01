@@ -26,8 +26,10 @@ Route::post('/csv', 'HomeController@downloadCSV')->name('csv');
 Route::get('/import', 'HomeController@showInportForm')->name('import');
 Route::post('/import', 'HomeController@import');
 Route::get('/category_info', 'HomeController@categoryInfo')->name('category_info');
+Route::get('/category_info/create', 'HomeController@showCategoryCreateForm')->name('master.category.create');
+Route::post('/category_info/create', 'HomeController@categoryMasterCreate');
 Route::get('/category_info/edit/{id}', 'HomeController@showCategoryEditForm')->name('master.category.edit');
-Route::post('/category_info/edit/{id}', 'HomeController@categoryMasterEdit')->name('master.category.edit');
+Route::post('/category_info/edit/{id}', 'HomeController@categoryMasterEdit');
 
 Route::get('/product', 'ProductController@index')->name('product');
 Route::post('/product/upload', 'ProductController@upload');

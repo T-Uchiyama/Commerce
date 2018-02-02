@@ -82,6 +82,11 @@
                                                 {{ csrf_field() }}
                                             </form>
                                         </li>
+                                        <li>
+                                            <a href="{{ route('display.order.pdf', Auth::user()->id) }}">
+                                                領収書出力
+                                            </a>
+                                        </li>
                                     </ul>
                                 </li>
                             @endguest

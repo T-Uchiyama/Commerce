@@ -49,6 +49,8 @@ Route::get('/display/checkout', 'DisplayController@getCheckout')->name('checkout
 Route::post('/display/checkout', 'DisplayController@purchase');
 Route::post('/display/changeCartNum', 'DisplayController@changeCartNum');
 Route::get('/display/search', 'DisplayController@getDisplaySearch')->name('display.search');
+Route::get('/display/pdf/{id}', 'DisplayController@showReceiptForm')->name('display.order.pdf');
+Route::post('/display/pdf/{id}', 'DisplayController@generateReceiptPDF')->name('display.order.pdf');
 
 Route::get('/regist_member', 'DisplayController@getRegistMember')->name('regist_member');
 

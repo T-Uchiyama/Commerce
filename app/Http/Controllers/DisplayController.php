@@ -200,6 +200,25 @@ class DisplayController extends Controller
     }
     
     /**
+     * 注文一覧画面の表示
+     * 
+     * @param  integer $id ユーザーID
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function showReceiptForm($id = 0)
+    {
+        $orders = $this->getOrderData($id);
+        $paymentTypeArr = array(
+            1 => 'クレジット決済', 
+            2 => '代引き',
+            3 => 'コンビニ決済'
+        );
+
+        return view('display.order', compact('orders', 'paymentTypeArr'));
+    }
+    
+    /**
      * ショッピングカート一覧の表示
      * 
      * @return \Illuminate\Http\Response
@@ -539,5 +558,25 @@ class DisplayController extends Controller
         $categoryList = $this->getCategoryData();
 
         return view('display.index', compact('productInfo', 'categoryList'));
+    }
+    
+    /**
+     * PDF形式で領収書生成
+     *
+     * @param $id 注文ID
+     * 
+     * @return PDF
+     */
+    public function generateReceiptPDF($id = 0)
+    {
+        if (!Auth::check()) {
+            $user = '○○ ○○';
+        } else {
+            $user = Auth::user()->name;    
+        }
+        $order = $this->getOrderMasterData($id);
+        $content = explode("\n", $order->purchase_content);
+        $pdf = \PDF::loadView('pdf.format', compact('user', 'content'));
+        return $pdf->stream('receipt.pdf');
     }
 }

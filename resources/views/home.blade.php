@@ -32,6 +32,11 @@
                         </a>
                     </div>
                     <div class="from-group">
+                        <a href="{{ route('order_info') }}">
+                            注文一覧を表示
+                        </a>
+                    </div>
+                    <div class="from-group">
                         <a href="{{ route('display') }}">
                             商品購入ページへ遷移
                         </a>

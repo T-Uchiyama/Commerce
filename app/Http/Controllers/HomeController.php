@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use \SplFileObject;
 use Carbon\Carbon;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Illuminate\Support\Facades\Auth;
 
 class HomeController extends Controller
 {
@@ -51,6 +52,12 @@ class HomeController extends Controller
     {
         $categoryMasterData = $this->getCategoryMasterData();
         return view('admin.category', compact('categoryMasterData'));
+    }
+    
+    public function orderInfo()
+    {
+        $orderMasterData = $this->getOrderMasterData();
+        return view('admin.order', compact('orderMasterData'));
     }
     
     /**
@@ -327,5 +334,25 @@ class HomeController extends Controller
                    ->withInput()
                    ->withErrors(['file' => '画像がアップロードされていないか不正なデータです。']);
         }
+    }
+
+    /**
+     * PDF形式で領収書生成
+     *
+     * @param $id 注文ID
+     * 
+     * @return PDF
+     */
+    public function generatePDF($id = 0)
+    {
+        if (!Auth::guard('admin')->check()) {
+            $user = '○○ ○○';
+        } else {
+            $user = Auth::guard('admin')->user()->name;    
+        }
+        $order = $this->getOrderMasterData($id);
+        $content = explode("\n", $order->purchase_content);
+        $pdf = \PDF::loadView('pdf.format', compact('user', 'content'));
+        return $pdf->stream('receipt.pdf');
     }
 }

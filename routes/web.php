@@ -30,6 +30,8 @@ Route::get('/category_info/create', 'HomeController@showCategoryCreateForm')->na
 Route::post('/category_info/create', 'HomeController@categoryMasterCreate');
 Route::get('/category_info/edit/{id}', 'HomeController@showCategoryEditForm')->name('master.category.edit');
 Route::post('/category_info/edit/{id}', 'HomeController@categoryMasterEdit');
+Route::get('/order_info', 'HomeController@orderInfo')->name('order_info');
+Route::post('/order_info/pdf/{id}', 'HomeController@generatePDF')->name('order.master.pdf');
 
 Route::get('/product', 'ProductController@index')->name('product');
 Route::post('/product/upload', 'ProductController@upload');

@@ -105,6 +105,22 @@ trait DataAcquisition
     }
     
     /**
+     * 注文情報をIDに応じて取得
+     *
+     * @param $id 注文ID
+     * 
+     * @return DB::table('orders')
+     */
+    public function getOrderMasterData($id = 0)
+    {
+        if ($id == 0) {
+            return DB::table('orders')->get();
+        } else {
+            return DB::table('orders')->where('id', $id)->first();
+        } 
+    }
+    
+    /**
      * 検索文字を取得しクエリを用い検索結果の表示
      * @param  $category_id カテゴリID
      * @param  $search_Text 検索文字列

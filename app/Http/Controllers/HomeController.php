@@ -36,24 +36,44 @@ class HomeController extends Controller
         return view('home');
     }
     
+    /**
+     * ユーザー一覧画面の表示
+     * 
+     * @return \Illuminate\Http\Response
+     */
     public function userInfo()
     {
         $userMasterData = $this->getUserMasterData();
         return view('admin.user', compact('userMasterData'));
     }
     
+    /**
+     * 商品一覧画面の表示
+     * 
+     * @return \Illuminate\Http\Response
+     */
     public function productInfo()
     {
         $productMasterData = $this->getProductMasterData();
         return view('admin.product', compact('productMasterData'));
     }
     
+    /**
+     * カテゴリ一覧画面の表示
+     * 
+     * @return \Illuminate\Http\Response
+     */
     public function categoryInfo()
     {
         $categoryMasterData = $this->getCategoryMasterData();
         return view('admin.category', compact('categoryMasterData'));
     }
     
+    /**
+     * 注文一覧画面の表示
+     * 
+     * @return \Illuminate\Http\Response
+     */
     public function orderInfo()
     {
         $orderMasterData = $this->getOrderMasterData();

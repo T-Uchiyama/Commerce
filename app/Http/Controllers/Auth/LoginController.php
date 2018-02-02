@@ -40,6 +40,11 @@ class LoginController extends Controller
         $this->middleware('guest')->except('logout');
     }
     
+    /**
+     * FacebookOAuth画面の表示
+     * 
+     * @return \Illuminate\Http\Response
+     */
     public function confirm_facebook()
     {        
         $authURL = 'http://www.facebook.com/dialog/oauth?client_id=' .  \Config::get('const.FACEBOOK_ID') . 
@@ -47,6 +52,11 @@ class LoginController extends Controller
         return redirect($authURL);
     }
     
+    /**
+     * TwitterOAuth画面の表示
+     * 
+     * @return \Illuminate\Http\Response
+     */
     public function confirm_twitter()
     {
         //TwitterOAuthインスタンスを新規作成
@@ -67,6 +77,11 @@ class LoginController extends Controller
         }
     }
     
+    /**
+     * Google+OAuth画面の表示
+     * 
+     * @return \Illuminate\Http\Response
+     */
     public function confirm_google()
     {
         // GoogleOAuth2インスタンス新規生成

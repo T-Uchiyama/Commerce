@@ -5,6 +5,7 @@ namespace App\Traits;
 use DB;
 use App\Product;    
 use Illuminate\Http\Request;
+use Redis;
 
 trait DataAcquisition
 {
@@ -171,5 +172,44 @@ trait DataAcquisition
             $productInfo = $this->getProductPaginate($option);
         }
         return $productInfo;
+    }
+    
+    /**
+     * Redisに閲覧したページ情報を記録
+     * 
+     * @param  integer $id 商品ID
+     */
+    public function setViewRanking($id = 0)
+    {
+        $key = "product_id:" . $id;
+
+        $value = Redis::get($key);
+        
+        if (empty($value)) {
+            Redis::set($key, "1");
+            Redis::expire($key, 60 * 60 * 24 *30); 
+        } else {
+            Redis::set($key, $value + 1);
+        }
+    }
+
+    /**
+     * Redisに格納されている閲覧情報を取得
+     * 
+     * @param  integer $id 商品ID
+     */
+    public function getViewRanking()
+    {
+        $keys = Redis::keys('product_id*');
+        $results = array();
+        
+        if (!empty($keys)) {
+            foreach ($keys as $key) {
+                $productId = explode(':', $key);
+                $results[$productId[1]] = Redis::get($key);
+            }
+            arsort($results, SORT_NUMERIC);
+        }
+        return $results;
     }
 }

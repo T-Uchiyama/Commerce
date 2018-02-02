@@ -153,7 +153,19 @@ class DisplayController extends Controller
 
         $productInfo = $this->getProductPaginate(40);
         $categoryList = $this->getCategoryData();
-        return view('display.index', compact('productInfo', 'categoryList'));
+        
+        $ranking = $this->getViewRanking();
+        $rankingProductData = array();
+        $counter = 0;
+        foreach ($ranking as $key => $value) {
+            if ($counter == 4) {
+                break;
+            }
+            $rankingProductData[] = $this->getProductList($key);
+            $counter++;
+        }
+        
+        return view('display.index', compact('productInfo', 'categoryList', 'rankingProductData'));
     }
     
     /**
@@ -166,6 +178,8 @@ class DisplayController extends Controller
     {
         $product = $this->getProductList($id);
         $productImageInfo = \App\Product::find($id)->productImages()->get();
+        
+        $this->setViewRanking($id);
         return view('display.detail', compact('product', 'productImageInfo'));
     }
     
@@ -557,7 +571,18 @@ class DisplayController extends Controller
         $productInfo = $this->getQuerySearch($categoryId, $searchText);
         $categoryList = $this->getCategoryData();
 
-        return view('display.index', compact('productInfo', 'categoryList'));
+        $ranking = $this->getViewRanking();
+        $rankingProductData = array();
+        $counter = 0;
+        foreach ($ranking as $key => $value) {
+            if ($counter == 4) {
+                break;
+            }
+            $rankingProductData[] = $this->getProductList($key);
+            $counter++;
+        }
+        
+        return view('display.index', compact('productInfo', 'categoryList', 'rankingProductData'));
     }
     
     /**

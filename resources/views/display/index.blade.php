@@ -24,6 +24,36 @@
                         {{ Form::close() }}
                     </div>
                     
+                    <div id="popular">
+                        <h3 align="center">人気の商品</h3>
+                        @foreach ($rankingProductData as $info)
+                        <ul id="item_content">
+                            <li>
+                                <div class="product_data">
+                                    <div class="image_file">
+                                        <a href="{{ url('/display/detail/'.$info->id) }}">
+                                            <p>
+                                                <img src="{{ asset('storage/image/' . $info->product_image) }}" alt="image" />
+                                            </p>
+                                        </a>
+                                    </div>
+                                    <div class="product_name">
+                                        <a href="{{ url('/display/detail/'.$info->id) }}">
+                                            {{ $info->product_name }}
+                                        </a>
+                                    </div>
+                                    <div class="product_price">
+                                        <a href="{{ url('/display/detail/'.$info->id) }}">
+                                            <span class="a-size-base a-color-price s-price a-text-bold">
+                                                ￥ {{ $info->price }}
+                                            </span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    @endforeach
                     <div id="content_wrapper">
                         @foreach ($productInfo->chunk(4) as $key => $info)
                         <ul id="item_content">

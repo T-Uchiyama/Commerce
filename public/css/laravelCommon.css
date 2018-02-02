@@ -212,3 +212,13 @@ a.disabled {
 #recent {
     max-width: 945px;
 }
+
+#popular {
+    max-width: 945px;
+    display: block;
+    border: 1px #ddd solid;
+    background-color: #fff;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 50px;
+}

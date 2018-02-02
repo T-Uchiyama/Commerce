@@ -20,10 +20,10 @@
                 </div>
             @endif
             <div class="panel panel-default">
-                <div class="panel-heading">商品在庫一覧</div>
+                <div class="panel-heading">注文情報一覧</div>
 
                 <div class="panel-body">
-                    <h4>ProductInfoTable</h4> 
+                    <h4>OrderInfoTable</h4> 
                     <div class="table-responsive">
                         <table class="table table-condensed">
                             <thead>

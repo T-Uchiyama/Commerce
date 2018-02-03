@@ -24,6 +24,7 @@
                         {{ Form::close() }}
                     </div>
                     
+                    @if ($rankingProductData)
                     <div id="popular">
                         <h3 align="center">人気の商品</h3>
                         @foreach ($rankingProductData as $info)
@@ -52,8 +53,10 @@
                                 </div>
                             </li>
                         </ul>
+                        @endforeach
                     </div>
-                    @endforeach
+                    @endif
+                    
                     <div id="content_wrapper">
                         @foreach ($productInfo->chunk(4) as $key => $info)
                         <ul id="item_content">

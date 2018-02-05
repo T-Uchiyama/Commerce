@@ -53,6 +53,7 @@ Route::get('/display/pdf/{id}', 'DisplayController@showReceiptForm')->name('disp
 Route::post('/display/pdf/{id}', 'DisplayController@generateReceiptPDF')->name('display.order.pdf');
 
 Route::get('/regist_member', 'DisplayController@getRegistMember')->name('regist_member');
+Route::post('/regist_member', 'Auth\LoginController@login');
 
 Route::get('/confirm_facebook', 'Auth\LoginController@confirm_facebook');
 Route::get('/confirm_twitter', 'Auth\LoginController@confirm_twitter');

@@ -58,101 +58,36 @@
                     @endif
                     
                     <div id="content_wrapper">
-                        @foreach ($productInfo->chunk(4) as $key => $info)
-                        <ul id="item_content">
-                            <li>
-                                <div class="product_data">
-                                    <div class="image_file">
-                                        <a href="{{ url('/display/detail/'.$productInfo[$key]->id) }}">
-                                            <p>
-                                                <img src="{{ asset('storage/image/' . $productInfo[$key]->product_image) }}" alt="image" />
-                                            </p>
-                                        </a>
+                        @foreach ($productInfo as $key => $info)
+                            @if ($key % 4 == 0)
+                            <ul id="item_content">
+                            @endif
+                                <li>
+                                    <div class="product_data">
+                                        <div class="image_file">
+                                            <a href="{{ url('/display/detail/'.$info->id) }}">
+                                                <p>
+                                                    <img src="{{ asset('storage/image/' . $info->product_image) }}" alt="image" />
+                                                </p>
+                                            </a>
+                                        </div>
+                                        <div class="product_name">
+                                            <a href="{{ url('/display/detail/'.$info->id) }}">
+                                                {{ $info->product_name }}
+                                            </a>
+                                        </div>
+                                        <div class="product_price">
+                                            <a href="{{ url('/display/detail/'.$info->id) }}">
+                                                <span class="a-size-base a-color-price s-price a-text-bold">
+                                                    ￥ {{ $info->price }}
+                                                </span>
+                                            </a>
+                                        </div>
                                     </div>
-                                    <div class="product_name">
-                                        <a href="{{ url('/display/detail/'.$productInfo[$key]->id) }}">
-                                            {{ $productInfo[$key]->product_name }}
-                                        </a>
-                                    </div>
-                                    <div class="product_price">
-                                        <a href="{{ url('/display/detail/'.$productInfo[$key]->id) }}">
-                                            <span class="a-size-base a-color-price s-price a-text-bold">
-                                                ￥ {{ $productInfo[$key]->price }}
-                                            </span>
-                                        </a>
-                                    </div>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="product_data">
-                                    <div class="image_file">
-                                        <a href="{{ url('/display/detail/'.$productInfo[$key + 1]->id) }}">
-                                            <p>
-                                                <img src="{{ asset('storage/image/' . $productInfo[$key + 1]->product_image) }}" alt="image" />
-                                            </p>
-                                        </a>
-                                    </div>
-                                    <div class="product_name">
-                                        <a href="{{ url('/display/detail/'.$productInfo[$key + 1]->id) }}">
-                                            {{ $productInfo[$key + 1]->product_name }}
-                                        </a>
-                                    </div>
-                                    <div class="product_price">
-                                        <a href="{{ url('/display/detail/'.$productInfo[$key + 1]->id) }}">
-                                            <span class="a-size-base a-color-price s-price a-text-bold">
-                                                ￥ {{ $productInfo[$key + 1]->price }}
-                                            </span>
-                                        </a>
-                                    </div>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="product_data">
-                                    <div class="image_file">
-                                        <a href="{{ url('/display/detail/'.$productInfo[$key + 2]->id) }}">
-                                            <p>
-                                                <img src="{{ asset('storage/image/' . $productInfo[$key + 2]->product_image) }}" alt="image" />
-                                            </p>
-                                        </a>
-                                    </div>
-                                    <div class="product_name">
-                                        <a href="{{ url('/display/detail/'.$productInfo[$key + 2]->id) }}">
-                                            {{ $productInfo[$key + 2]->product_name }}
-                                        </a>
-                                    </div>
-                                    <div class="product_price">
-                                        <a href="{{ url('/display/detail/'.$productInfo[$key + 2]->id) }}">
-                                            <span class="a-size-base a-color-price s-price a-text-bold">
-                                                ￥ {{ $productInfo[$key + 2]->price }}
-                                            </span>
-                                        </a>
-                                    </div>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="product_data">
-                                    <div class="image_file">
-                                        <a href="{{ url('/display/detail/'.$productInfo[$key + 3]->id) }}">
-                                            <p>
-                                                <img src="{{ asset('storage/image/' . $productInfo[$key + 3]->product_image) }}" alt="image" />
-                                            </p>
-                                        </a>
-                                    </div>
-                                    <div class="product_name">
-                                        <a href="{{ url('/display/detail/'.$productInfo[$key + 3]->id) }}">
-                                            {{ $productInfo[$key + 3]->product_name }}
-                                        </a>
-                                    </div>
-                                    <div class="product_price">
-                                        <a href="{{ url('/display/detail/'.$productInfo[$key + 3]->id) }}">
-                                            <span class="a-size-base a-color-price s-price a-text-bold">
-                                                ￥ {{ $productInfo[$key + 3]->price }}
-                                            </span>
-                                        </a>
-                                    </div>
-                                </div>
-                            </li>
-                        </ul>
+                                </li>
+                            @if ($key % 4 == 3 || $key == count($productInfo))
+                            </ul>
+                            @endif
                         @endforeach
                     </div>
                     

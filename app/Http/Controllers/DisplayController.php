@@ -158,7 +158,7 @@ class DisplayController extends Controller
         $rankingProductData = array();
         $counter = 0;
         foreach ($ranking as $key => $value) {
-            if ($counter == 4) {
+            if ($counter > 3) {
                 break;
             }
             $rankingProductData[] = $this->getProductList($key);
@@ -575,7 +575,7 @@ class DisplayController extends Controller
         $rankingProductData = array();
         $counter = 0;
         foreach ($ranking as $key => $value) {
-            if ($counter == 4) {
+            if ($counter > 3) {
                 break;
             }
             $rankingProductData[] = $this->getProductList($key);
